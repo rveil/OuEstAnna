@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Où est Anna ?</title>
 <meta name="description" content="Le planning d'Anna, tenu à jour par Marie et Raph.">
+<meta name="robots" content="noindex, nofollow">
 <meta name="color-scheme" content="light dark">
 <style>
 /* ================================================================
@@ -150,6 +151,21 @@ footer{margin-top:2.4rem;padding-top:1.2rem;border-top:1px solid var(--line);
   font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.82em;word-break:break-all}
 .msg ol{margin:.5rem 0 0;padding-left:1.2rem} .msg li{margin:.35rem 0}
 .empty{color:var(--ink-3);font-size:.88rem;padding:1.1rem 0;margin:0}
+.porte{background:var(--card);border:1px solid var(--line);border-radius:16px;
+  padding:1.5rem 1.35rem;box-shadow:var(--shadow);max-width:24rem;margin:1rem auto}
+.porte p{margin:0 0 1rem;font-size:.88rem;color:var(--ink-2);line-height:1.6}
+.porte label{display:block;font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--ink-3);margin:0 0 .35rem}
+.porte input{width:100%;font:inherit;font-size:1rem;padding:.6rem .8rem;border-radius:10px;
+  background:var(--bg);color:var(--ink);border:1px solid var(--line);
+  -webkit-appearance:none;appearance:none}
+.porte input:focus{outline:none;border-color:var(--ink-3)}
+.porte .bt{width:100%;margin-top:.8rem;font:inherit;font-size:.95rem;font-weight:600;
+  padding:.62rem;border-radius:10px;cursor:pointer;border:0;background:var(--ink);color:var(--bg)}
+.porte .bt[disabled]{opacity:.55;cursor:default}
+.porte .err{color:var(--raph);font-size:.82rem;margin:.7rem 0 0;min-height:1.2em}
+.oubli{display:inline;border:0;background:none;padding:0;font:inherit;font-size:inherit;
+  color:var(--ink-3);text-decoration:underline;cursor:pointer}
 .skel{height:1rem;background:var(--line-2);border-radius:5px;animation:p 1.4s ease-in-out infinite}
 @keyframes p{0%,100%{opacity:.5}50%{opacity:.9}}
 </style>
@@ -188,6 +204,17 @@ const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSq70Ble2mZGcGv
    Le tableur doit alors être partagé en « Tout utilisateur disposant du lien — Lecteur ». */
 const SHEET_ID = "";
 const SHEET_GID = "1504266455";
+
+/* ------------------------------------------------------------------
+   MOT DE PASSE (facultatif)
+   Tant que COFFRE est vide, la page s'ouvre sans mot de passe.
+   Une fois rempli, l'adresse du tableur n'existe plus en clair dans ce
+   fichier : elle est chiffrée, et seule la saisie du mot de passe permet
+   de la reconstituer. Mettre alors CSV_URL à "".
+   Le contenu de COFFRE se fabrique avec « outil-mot-de-passe.html »,
+   à garder sur votre ordinateur (ne pas le déposer sur GitHub).
+   ------------------------------------------------------------------ */
+const COFFRE = "";
 
 /* ------------------------------------------------------------------ */
 const P = new URLSearchParams(location.search);
@@ -322,19 +349,21 @@ function trajetsDepuis(complets){
     const a=complets[i], b=complets[i+1];
     if(a.ou === b.ou) continue;                       // même lieu : pas de trajet
     if(a.ou === BASE && b.ou === BASE) continue;
-    let sens, date, date2=null, quis, ous, note;
+    let sens, date, date2=null, quis, ous, note, couleur;
     if(a.ou === BASE){
       sens="Aller";  date=b.debut; quis=[b.qui]; ous=[b.ou];
-      note = esc(LIBELLE[b.qui]||b.qui);
+      note = esc(LIBELLE[b.qui]||b.qui); couleur = CLASSE[b.qui]||"m-def";
     } else if(b.ou === BASE){
       sens="Retour"; date=a.fin;   quis=[a.qui]; ous=[a.ou];
-      note = esc(LIBELLE[a.qui]||a.qui);
+      note = esc(LIBELLE[a.qui]||a.qui); couleur = CLASSE[a.qui]||"m-def";
     } else {
       sens="Transit"; date=a.fin; date2=b.debut; quis=[a.qui,b.qui]; ous=[a.ou,b.ou];
       note = a.qui===b.qui ? esc(LIBELLE[a.qui]||a.qui)
            : `Passation : ${esc(a.qui)} → ${esc(b.qui)}`;
+      // passation entre deux personnes : on ne sait pas de qui est le trajet -> violet
+      couleur = a.qui===b.qui ? (CLASSE[a.qui]||"m-def") : "m-tous";
     }
-    out.push({sens, date, date2, de:a.ou, vers:b.ou, quis, ous, note,
+    out.push({sens, date, date2, de:a.ou, vers:b.ou, quis, ous, note, couleur,
       hay: norm([sens, a.ou, b.ou, a.qui, b.qui, LIBELLE[a.qui]||"", LIBELLE[b.qui]||"", note,
                  libelleDate(date), date2?libelleDate(date2):"",
                  MOIS[dparts(date).m]+" "+dparts(date).y,
@@ -408,7 +437,7 @@ function ligneBloc(b){
 }
 
 function ligneTrajet(t){
-  const cl = CLASSE[t.quis[t.quis.length-1]] || "m-def";
+  const cl = t.couleur || "m-def";
   const finT = t.date2 || t.date;
   const ici = t.date===STATE.today || finT===STATE.today;
   const passe = finT < STATE.today ? " past" : "";
@@ -583,16 +612,96 @@ function rendre(days){
 
   document.getElementById("legend").innerHTML = Object.keys(CLASSE).map(k=>
     `<span class="${CLASSE[k]}" style="background:var(--cb);color:var(--c)">${esc(LIBELLE[k])}</span>`).join("");
-  const maj=new Date();
+  const dt = d => d.toLocaleDateString("fr-FR") + " à " +
+                  d.toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"});
+  const maj = new Date();
   document.getElementById("foot").innerHTML =
     `« Trajets » liste chaque changement de lieu : aller depuis Corenc, retour vers Corenc,
      ou transit entre deux séjours — auquel cas les deux dates possibles sont indiquées.<br>
-     Planning tenu à jour par Marie et Raph. Page actualisée le ${maj.toLocaleDateString("fr-FR")} à ${
-       maj.toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"})}.`;
+     ${STATE.majSource
+        ? `Planning modifié pour la dernière fois le <strong>${dt(STATE.majSource)}</strong>.`
+        : "Planning tenu à jour par Marie et Raph."}
+     Page chargée le ${dt(maj)}.` +
+    (COFFRE ? ` <button class="oubli" id="oubli" type="button">Oublier le mot de passe sur cet appareil</button>.` : "");
+  const ob = document.getElementById("oubli");
+  if(ob) ob.addEventListener("click", oublier);
 }
 
 /* ==================================================================
-   5. CHARGEMENT
+   5. COFFRE — mot de passe et déchiffrement de l'adresse du tableur
+   PBKDF2-SHA256 (200 000 tours) pour dériver la clé, AES-GCM pour le
+   contenu. Sans le mot de passe, le fichier ne contient rien d'exploitable.
+   ================================================================== */
+const CLE_STOCK = "anna-cle", JOURS_MEMOIRE = 30;
+const b64 = {
+  enc: buf => btoa(String.fromCharCode(...new Uint8Array(buf))),
+  dec: s => Uint8Array.from(atob(s.replace(/-/g,"+").replace(/_/g,"/")), c=>c.charCodeAt(0)),
+};
+async function deriver(motdepasse, sel){
+  const base = await crypto.subtle.importKey("raw", new TextEncoder().encode(motdepasse),
+                                             "PBKDF2", false, ["deriveKey"]);
+  return crypto.subtle.deriveKey({name:"PBKDF2", salt:sel, iterations:200000, hash:"SHA-256"},
+                                 base, {name:"AES-GCM", length:256}, true, ["encrypt","decrypt"]);
+}
+async function ouvrir(coffre, cle){
+  const [, , iv, txt] = coffre.split(".");
+  const clair = await crypto.subtle.decrypt({name:"AES-GCM", iv:b64.dec(iv)}, cle, b64.dec(txt));
+  return new TextDecoder().decode(clair);
+}
+async function cleMemorisee(){
+  try{
+    const raw = localStorage.getItem(CLE_STOCK);
+    if(!raw) return null;
+    const {k, exp} = JSON.parse(raw);
+    if(Date.now() > exp){ localStorage.removeItem(CLE_STOCK); return null; }
+    return await crypto.subtle.importKey("raw", b64.dec(k), {name:"AES-GCM"}, true, ["decrypt"]);
+  }catch(e){ return null; }
+}
+async function memoriser(cle){
+  try{
+    const raw = await crypto.subtle.exportKey("raw", cle);
+    localStorage.setItem(CLE_STOCK, JSON.stringify(
+      {k:b64.enc(raw), exp: Date.now() + JOURS_MEMOIRE*86400000}));
+  }catch(e){ /* navigation privée : on ne mémorise pas, sans conséquence */ }
+}
+function oublier(){
+  try{ localStorage.removeItem(CLE_STOCK); }catch(e){}
+  location.reload();
+}
+
+function demanderMotDePasse(erreurPrecedente){
+  document.getElementById("sub").textContent = "Planning privé";
+  document.getElementById("app").innerHTML = `<div class="porte">
+    <p>Le planning d'Anna est réservé à la famille. Entrez le mot de passe pour l'afficher.</p>
+    <label for="mdp">Mot de passe</label>
+    <input id="mdp" type="password" autocomplete="current-password" enterkeyhint="go">
+    <button class="bt" id="ok" type="button">Voir le planning</button>
+    <p class="err" id="err">${erreurPrecedente||""}</p>
+    <p style="margin:.2rem 0 0;font-size:.76rem;color:var(--ink-3)">
+      Une fois saisi, il est retenu ${JOURS_MEMOIRE} jours sur cet appareil.</p>
+  </div>`;
+  const mdp=document.getElementById("mdp"), ok=document.getElementById("ok"), err=document.getElementById("err");
+  const essayer = async () => {
+    if(!mdp.value){ mdp.focus(); return; }
+    ok.disabled=true; ok.textContent="Vérification…"; err.textContent="";
+    try{
+      const cle = await deriver(mdp.value, b64.dec(COFFRE.split(".")[1]));
+      const url = await ouvrir(COFFRE, cle);         // échoue si le mot de passe est faux
+      await memoriser(cle);
+      charger([{nom:"tableur (adresse déchiffrée)", url}]);
+    }catch(e){
+      ok.disabled=false; ok.textContent="Voir le planning";
+      err.textContent="Mot de passe incorrect.";
+      mdp.select();
+    }
+  };
+  ok.addEventListener("click", essayer);
+  mdp.addEventListener("keydown", e=>{ if(e.key==="Enter") essayer(); });
+  mdp.focus();
+}
+
+/* ==================================================================
+   6. CHARGEMENT
    ================================================================== */
 function sources(){
   const q = P.get("csv");
@@ -639,8 +748,7 @@ function diagnostic(essais){
   document.getElementById("retry").addEventListener("click", go);
 }
 
-async function go(){
-  const liste = sources();
+async function charger(liste){
   if(!liste.length){ setup(); return; }
   document.getElementById("sub").textContent = "Chargement du planning…";
   const essais=[];
@@ -648,6 +756,10 @@ async function go(){
     try{
       const r = await fetch(src.url, {cache:"no-store"});
       if(!r.ok) throw new Error("réponse HTTP "+r.status);
+      // « Last-Modified » fait partie des en-têtes lisibles sans autorisation
+      // particulière ; Google ne l'envoie pas toujours, d'où le repli silencieux.
+      const lm = r.headers.get("Last-Modified");
+      STATE.majSource = lm && !isNaN(Date.parse(lm)) ? new Date(lm) : null;
       const days = toObjects(parseCSV(await r.text()));
       if(!days.length) throw new Error("aucune ligne exploitable dans la réponse");
       days.sort((a,b)=>a.date<b.date?-1:1);
@@ -660,6 +772,24 @@ async function go(){
   }
   document.getElementById("sub").textContent = "Planning momentanément indisponible";
   diagnostic(essais);
+}
+
+async function go(){
+  if(COFFRE && !P.get("csv")){
+    if(!window.crypto || !crypto.subtle){
+      panneau("Page à ouvrir en ligne",
+        `Le déverrouillage a besoin d'une connexion sécurisée. Ouvrez cette page depuis son
+         adresse <code>https://…</code> plutôt que depuis le disque.`);
+      return;
+    }
+    const cle = await cleMemorisee();
+    if(cle){
+      try{ return charger([{nom:"tableur (adresse déchiffrée)", url: await ouvrir(COFFRE, cle)}]); }
+      catch(e){ try{ localStorage.removeItem(CLE_STOCK); }catch(_){} }
+    }
+    return demanderMotDePasse();
+  }
+  return charger(sources());
 }
 go();
 </script>
