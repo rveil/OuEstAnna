@@ -211,10 +211,13 @@ const SHEET_GID = "1504266455";
    Une fois rempli, l'adresse du tableur n'existe plus en clair dans ce
    fichier : elle est chiffrée, et seule la saisie du mot de passe permet
    de la reconstituer. Mettre alors CSV_URL à "".
-   Le contenu de COFFRE se fabrique avec « outil-mot-de-passe.html »,
-   à garder sur votre ordinateur (ne pas le déposer sur GitHub).
+   QUESTION est l'indice affiché au visiteur (« Quel est le nom de son doudou ? ») :
+   il reste en clair, c'est voulu.
+   Ces trois lignes se fabriquent avec « outil-mot-de-passe.html », qui régénère un
+   index.html complet — à garder sur votre ordinateur (ne pas le déposer sur GitHub).
    ------------------------------------------------------------------ */
 const COFFRE = "";
+const QUESTION = "";
 
 /* ------------------------------------------------------------------ */
 const P = new URLSearchParams(location.search);
@@ -228,6 +231,13 @@ const LIBELLE = {"Marie":"Avec Marie","Raph":"Avec Raph","Tous les 3":"Tous les 
                  "Autres":"Autres","À définir":"À définir"};
 const BASE = "Corenc", PARIS = "Paris", NONDEF = "À définir";
 
+/* Un nom saisi librement (« Lydia », « Grands-parents ») est compté dans « Autres »
+   par le tableur : la page doit le colorer pareil, en vert, et non en gris. */
+function classeQui(q){
+  if(!q) return "m-def";
+  return CLASSE[q] || CLASSE["Autres"];
+}
+function categorieQui(q){ return CLASSE[q] ? q : "Autres"; }
 function classeLieu(o){
   if(!o || o===NONDEF) return "";
   if(o===BASE) return "at-base";
@@ -265,11 +275,21 @@ function toObjects(rows){
   const ix = n => h.indexOf(n);
   const iD=ix("Date"), iJ=ix("Jour"), iQ=ix("Avec qui ?"), iO=ix("Où ça ?"),
         iC=ix("Commentaire"), iT=ix("Type");
+  const iM = ix("Mise à jour");
   if(iD<0||iQ<0) throw new Error("colonnes introuvables");
-  return rows.slice(1).map(r=>({
+  const days = rows.slice(1).map(r=>({
     date:(r[iD]||"").trim(), jour:(r[iJ]||"").trim(), qui:(r[iQ]||"").trim(),
     ou:(r[iO]||"").trim(), com:(r[iC]||"").trim(), typ:(r[iT]||"").trim()
   })).filter(d=>/^\d{4}-\d{2}-\d{2}$/.test(d.date));
+  // colonne facultative « Mise à jour » : horodatage écrit par le tableur à chaque modification
+  let maj = null;
+  if(iM >= 0){
+    for(const r of rows.slice(1)){
+      const d = litDate(r[iM]);
+      if(d){ maj = d; break; }
+    }
+  }
+  return {days, maj};
 }
 
 /* ---------- dates ---------- */
@@ -288,6 +308,15 @@ function libellePeriode(b){
   return `${cap(libelleDate(b.debut,true))} → ${libelleDate(b.fin,true)}${an}`;
 }
 function cap(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
+/* Le tableur peut écrire l'horodatage en ISO ou au format français. On teste le format
+   français d'abord : « 12/03/2027 » serait sinon lu comme le 3 décembre par le navigateur. */
+function litDate(v){
+  if(!v) return null;
+  const m = String(v).trim().match(
+    /^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:[ ,]+(\d{1,2}):(\d{2})(?::(\d{2}))?)?$/);
+  if(m) return new Date(+m[3], +m[2]-1, +m[1], +(m[4]||0), +(m[5]||0), +(m[6]||0));
+  return isNaN(Date.parse(v)) ? null : new Date(v);
+}
 function aujourdhui(){
   const n=new Date();
   return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,"0")}-${String(n.getDate()).padStart(2,"0")}`;
@@ -352,16 +381,16 @@ function trajetsDepuis(complets){
     let sens, date, date2=null, quis, ous, note, couleur;
     if(a.ou === BASE){
       sens="Aller";  date=b.debut; quis=[b.qui]; ous=[b.ou];
-      note = esc(LIBELLE[b.qui]||b.qui); couleur = CLASSE[b.qui]||"m-def";
+      note = esc(LIBELLE[b.qui]||b.qui); couleur = classeQui(b.qui);
     } else if(b.ou === BASE){
       sens="Retour"; date=a.fin;   quis=[a.qui]; ous=[a.ou];
-      note = esc(LIBELLE[a.qui]||a.qui); couleur = CLASSE[a.qui]||"m-def";
+      note = esc(LIBELLE[a.qui]||a.qui); couleur = classeQui(a.qui);
     } else {
       sens="Transit"; date=a.fin; date2=b.debut; quis=[a.qui,b.qui]; ous=[a.ou,b.ou];
       note = a.qui===b.qui ? esc(LIBELLE[a.qui]||a.qui)
            : `Passation : ${esc(a.qui)} → ${esc(b.qui)}`;
       // passation entre deux personnes : on ne sait pas de qui est le trajet -> violet
-      couleur = a.qui===b.qui ? (CLASSE[a.qui]||"m-def") : "m-tous";
+      couleur = a.qui===b.qui ? classeQui(a.qui) : "m-tous";
     }
     out.push({sens, date, date2, de:a.ou, vers:b.ou, quis, ous, note, couleur,
       hay: norm([sens, a.ou, b.ou, a.qui, b.qui, LIBELLE[a.qui]||"", LIBELLE[b.qui]||"", note,
@@ -375,31 +404,26 @@ function trajetsDepuis(complets){
    3. FILTRES
    ================================================================== */
 const PERIODES = [
-  {id:"tout",    lab:"Tout",      seul:true},
-  {id:"we",      lab:"Week-ends"},
-  {id:"vac",     lab:"Vacances"},
-  {id:"trajets", lab:"Trajets",   seul:true},
+  {id:"tout",    lab:"Tout"},
+  {id:"we-vac",  lab:"Week-ends & Vacances"},
+  {id:"trajets", lab:"Trajets"},
 ];
 const F_QUI = ["Raph","Marie","Tous les 3","Autres",NONDEF];
 const F_QUI_LAB = {"Raph":"Raph","Marie":"Marie","Tous les 3":"Tous les 3",
                    "Autres":"Autres",[NONDEF]:NONDEF};
 const F_OU  = ["Paris","Corenc","Autres",NONDEF];
 
-const STATE = {today:"", per:new Set(["we","vac"]), qui:new Set(), ou:new Set(),
+const STATE = {today:"", periode:"we-vac", qui:new Set(), ou:new Set(),
                complets:[], events:[], trajets:[], premierRendu:true};
 
 function sourceBlocs(){
-  if(STATE.per.has("tout")) return STATE.complets;
-  const we  = STATE.per.has("we"), vac = STATE.per.has("vac");
-  return STATE.events.filter(b=>{
-    const estVac = b.types.has("vacances");
-    if(vac && estVac) return true;
-    if(we && !estVac && (b.types.has("week-end")||b.types.has("férié"))) return true;
-    return false;
-  });
+  if(STATE.periode === "tout") return STATE.complets;
+  // Périodes de vacances entières, et week-ends et jours fériés hors vacances.
+  return STATE.events.filter(b=> b.types.has("vacances")
+        || b.types.has("week-end") || b.types.has("férié"));
 }
 function passeQuiOu(quis, ous){
-  if(STATE.qui.size && !quis.some(q=>STATE.qui.has(q))) return false;
+  if(STATE.qui.size && !quis.some(q=>STATE.qui.has(categorieQui(q)))) return false;
   if(STATE.ou.size && !ous.some(o=>STATE.ou.has(categorieLieu(o)))) return false;
   return true;
 }
@@ -407,7 +431,7 @@ function requete(){ const e=document.getElementById("q"); return e ? norm(e.valu
 
 function elements(){
   const q = requete();
-  if(STATE.per.has("trajets")){
+  if(STATE.periode === "trajets"){
     return STATE.trajets.filter(t=> passeQuiOu(t.quis,t.ous) && (!q || t.hay.includes(q)));
   }
   return sourceBlocs().filter(b=> passeQuiOu([b.qui],[b.ou]) && (!q || b.hay.includes(q)));
@@ -417,7 +441,7 @@ function elements(){
    4. RENDU
    ================================================================== */
 function ligneBloc(b){
-  const cl = CLASSE[b.qui] || "m-def";
+  const cl = classeQui(b.qui);
   const ici = b.debut<=STATE.today && STATE.today<=b.fin;
   const passe = b.fin < STATE.today ? " past" : "";
   const lieu = (b.ou && b.ou!==NONDEF)
@@ -437,7 +461,7 @@ function ligneBloc(b){
 }
 
 function ligneTrajet(t){
-  const cl = t.couleur || "m-def";
+  const cl = t.couleur || classeQui(t.quis[t.quis.length-1]);
   const finT = t.date2 || t.date;
   const ici = t.date===STATE.today || finT===STATE.today;
   const passe = finT < STATE.today ? " past" : "";
@@ -477,7 +501,7 @@ function parMois(items, dateDe, rendu){
 function renderList(){
   const l = elements();
   const res = document.getElementById("results");
-  const trajets = STATE.per.has("trajets");
+  const trajets = STATE.periode === "trajets";
   if(!l.length){
     res.innerHTML = `<p class="empty">Rien ne correspond à cette combinaison de filtres.</p>`;
     majSub(0);
@@ -503,7 +527,7 @@ function allerAAujourdhui(doux){
 /* ---------- barre d'outils ---------- */
 function barreHTML(){
   const bp = PERIODES.map(p=>
-    `<button data-cat="per" data-v="${p.id}"${STATE.per.has(p.id)?' class="on"':""}>${p.lab}</button>`).join("");
+    `<button data-cat="per" data-v="${p.id}"${p.id===STATE.periode?' class="on"':""}>${p.lab}</button>`).join("");
   const bq = F_QUI.map(v=>
     `<button data-cat="qui" data-v="${esc(v)}">${esc(F_QUI_LAB[v])}</button>`).join("");
   const bo = F_OU.map(v=>
@@ -531,17 +555,10 @@ function initTools(){
   for(const btn of document.querySelectorAll(".frow button")){
     btn.addEventListener("click", ()=>{
       const cat=btn.dataset.cat, v=btn.dataset.v;
-      if(cat==="per"){
-        const seul = PERIODES.find(p=>p.id===v).seul;
-        if(seul){                                     // « Tout » et « Trajets » : exclusifs
-          STATE.per = new Set([v]);
-        } else {                                      // « Week-ends » et « Vacances » : cumulables
-          STATE.per.delete("tout"); STATE.per.delete("trajets");
-          STATE.per.has(v) ? STATE.per.delete(v) : STATE.per.add(v);
-          if(!STATE.per.size) STATE.per = new Set(["tout"]);
-        }
+      if(cat==="per"){                              // les trois options s'excluent
+        STATE.periode = v;
         for(const b of document.querySelectorAll('[data-cat="per"]'))
-          b.classList.toggle("on", STATE.per.has(b.dataset.v));
+          b.classList.toggle("on", b.dataset.v===v);
       } else {
         const set = STATE[cat];
         set.has(v) ? set.delete(v) : set.add(v);
@@ -559,7 +576,7 @@ function carteNow(){
   const bouton = enCours ? `<p class="goto"><button type="button" id="jump">Voir dans la liste</button></p>` : "";
   if(enCours){
     const reste = jourNum(enCours.fin)-jourNum(today);
-    return `<div class="now ${CLASSE[enCours.qui]||"m-def"}">
+    return `<div class="now ${classeQui(enCours.qui)}">
       <p class="lab">En ce moment</p>
       <p class="who" style="color:var(--c)">${esc(LIBELLE[enCours.qui]||enCours.qui)}</p>
       <p class="where ${classeLieu(enCours.ou)}"${enCours.ou===NONDEF?' style="font-style:italic"':''}>${
@@ -572,7 +589,7 @@ function carteNow(){
   }
   const d=STATE.jours;
   const avant = today < d[0].date, apres = today > d[d.length-1].date;
-  const cl = apres ? "m-def" : (suivant ? (CLASSE[suivant.qui]||"m-def") : "m-marie");
+  const cl = apres ? "m-def" : (suivant ? classeQui(suivant.qui) : "m-marie");
   const titre = avant ? "Le planning n'a pas encore commencé"
               : apres ? "Le planning s'arrête ici" : "Semaine d'école";
   const sous  = avant ? "Il démarre le "+libelleDate(d[0].date)
@@ -622,7 +639,7 @@ function rendre(days){
         ? `Planning modifié pour la dernière fois le <strong>${dt(STATE.majSource)}</strong>.`
         : "Planning tenu à jour par Marie et Raph."}
      Page chargée le ${dt(maj)}.` +
-    (COFFRE ? ` <button class="oubli" id="oubli" type="button">Oublier le mot de passe sur cet appareil</button>.` : "");
+    (COFFRE ? ` <button class="oubli" id="oubli" type="button">Oublier la réponse sur cet appareil</button>.` : "");
   const ob = document.getElementById("oubli");
   if(ob) ob.addEventListener("click", oublier);
 }
@@ -633,19 +650,30 @@ function rendre(days){
    contenu. Sans le mot de passe, le fichier ne contient rien d'exploitable.
    ================================================================== */
 const CLE_STOCK = "anna-cle", JOURS_MEMOIRE = 30;
+/* La réponse est tapée par des grands-parents : on l'aplatit avant de dériver la clé,
+   pour que « Doudou », « doudou » et « le Doudou » ouvrent la même porte. */
+function aplatir(s){
+  return String(s).toLowerCase().normalize("NFD")
+    .replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]/g,"");
+}
+function partsCoffre(c){
+  const p = c.split(".");
+  return p[0]==="v2" ? {iter:+p[1], sel:p[2], iv:p[3], txt:p[4]}
+                     : {iter:200000, sel:p[1], iv:p[2], txt:p[3]};
+}
 const b64 = {
   enc: buf => btoa(String.fromCharCode(...new Uint8Array(buf))),
   dec: s => Uint8Array.from(atob(s.replace(/-/g,"+").replace(/_/g,"/")), c=>c.charCodeAt(0)),
 };
-async function deriver(motdepasse, sel){
-  const base = await crypto.subtle.importKey("raw", new TextEncoder().encode(motdepasse),
+async function deriver(reponse, sel, iter){
+  const base = await crypto.subtle.importKey("raw", new TextEncoder().encode(aplatir(reponse)),
                                              "PBKDF2", false, ["deriveKey"]);
-  return crypto.subtle.deriveKey({name:"PBKDF2", salt:sel, iterations:200000, hash:"SHA-256"},
+  return crypto.subtle.deriveKey({name:"PBKDF2", salt:sel, iterations:iter, hash:"SHA-256"},
                                  base, {name:"AES-GCM", length:256}, true, ["encrypt","decrypt"]);
 }
 async function ouvrir(coffre, cle){
-  const [, , iv, txt] = coffre.split(".");
-  const clair = await crypto.subtle.decrypt({name:"AES-GCM", iv:b64.dec(iv)}, cle, b64.dec(txt));
+  const p = partsCoffre(coffre);
+  const clair = await crypto.subtle.decrypt({name:"AES-GCM", iv:b64.dec(p.iv)}, cle, b64.dec(p.txt));
   return new TextDecoder().decode(clair);
 }
 async function cleMemorisee(){
@@ -672,26 +700,29 @@ function oublier(){
 function demanderMotDePasse(erreurPrecedente){
   document.getElementById("sub").textContent = "Planning privé";
   document.getElementById("app").innerHTML = `<div class="porte">
-    <p>Le planning d'Anna est réservé à la famille. Entrez le mot de passe pour l'afficher.</p>
-    <label for="mdp">Mot de passe</label>
-    <input id="mdp" type="password" autocomplete="current-password" enterkeyhint="go">
+    <p>Le planning d'Anna est réservé à la famille.</p>
+    <label for="mdp">${QUESTION ? esc(QUESTION) : "Mot de passe"}</label>
+    <input id="mdp" type="text" autocomplete="off" autocapitalize="none" spellcheck="false"
+           enterkeyhint="go">
     <button class="bt" id="ok" type="button">Voir le planning</button>
     <p class="err" id="err">${erreurPrecedente||""}</p>
     <p style="margin:.2rem 0 0;font-size:.76rem;color:var(--ink-3)">
-      Une fois saisi, il est retenu ${JOURS_MEMOIRE} jours sur cet appareil.</p>
+      Ni les accents, ni les majuscules, ni les espaces, ni la ponctuation ne comptent.
+      Une fois trouvée, la réponse est retenue ${JOURS_MEMOIRE} jours sur cet appareil.</p>
   </div>`;
   const mdp=document.getElementById("mdp"), ok=document.getElementById("ok"), err=document.getElementById("err");
   const essayer = async () => {
     if(!mdp.value){ mdp.focus(); return; }
     ok.disabled=true; ok.textContent="Vérification…"; err.textContent="";
     try{
-      const cle = await deriver(mdp.value, b64.dec(COFFRE.split(".")[1]));
+      const p = partsCoffre(COFFRE);
+      const cle = await deriver(mdp.value, b64.dec(p.sel), p.iter);
       const url = await ouvrir(COFFRE, cle);         // échoue si le mot de passe est faux
       await memoriser(cle);
       charger([{nom:"tableur (adresse déchiffrée)", url}]);
     }catch(e){
       ok.disabled=false; ok.textContent="Voir le planning";
-      err.textContent="Mot de passe incorrect.";
+      err.textContent = QUESTION ? "Ce n'est pas la bonne réponse." : "Mot de passe incorrect.";
       mdp.select();
     }
   };
@@ -756,11 +787,10 @@ async function charger(liste){
     try{
       const r = await fetch(src.url, {cache:"no-store"});
       if(!r.ok) throw new Error("réponse HTTP "+r.status);
-      // « Last-Modified » fait partie des en-têtes lisibles sans autorisation
-      // particulière ; Google ne l'envoie pas toujours, d'où le repli silencieux.
-      const lm = r.headers.get("Last-Modified");
-      STATE.majSource = lm && !isNaN(Date.parse(lm)) ? new Date(lm) : null;
-      const days = toObjects(parseCSV(await r.text()));
+      const {days, maj} = toObjects(parseCSV(await r.text()));
+      // Priorité à la colonne « Mise à jour » du tableur. À défaut, l'en-tête HTTP
+      // « Last-Modified » — que Google n'envoie pas toujours, d'où le repli silencieux.
+      STATE.majSource = maj || litDate(r.headers.get("Last-Modified"));
       if(!days.length) throw new Error("aucune ligne exploitable dans la réponse");
       days.sort((a,b)=>a.date<b.date?-1:1);
       rendre(days);
