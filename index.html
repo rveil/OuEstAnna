@@ -44,6 +44,8 @@ body{
 header{padding:2.2rem 0 1.1rem}
 h1{font-size:1.5rem;line-height:1.15;letter-spacing:-.02em;margin:0 0 .3rem;font-weight:650}
 .sub{color:var(--ink-3);font-size:.82rem;margin:0}
+.maj{margin-top:.12rem}
+.maj:empty{display:none}
 
 /* ---------------- carte "maintenant" ---------------- */
 .now{
@@ -176,6 +178,7 @@ footer{margin-top:2.4rem;padding-top:1.2rem;border-top:1px solid var(--line);
 <header>
   <h1>Où est Anna&nbsp;?</h1>
   <p class="sub" id="sub">Chargement du planning…</p>
+  <p class="sub maj" id="maj"></p>
 </header>
 
 <main id="app">
@@ -216,7 +219,7 @@ const SHEET_GID = "1504266455";
    Ces trois lignes se fabriquent avec « outil-mot-de-passe.html », qui régénère un
    index.html complet — à garder sur votre ordinateur (ne pas le déposer sur GitHub).
    ------------------------------------------------------------------ */
-const COFFRE = "v2.300000.Pah7D1oCiQYgwYcPJRP6UQ==.8v3pwN4qyguGqaiX.imhLnou4q1pCOrOfdaAB/mixerpgg012WNK7XSYY0Hp1w8U4dAYkcDyYz/AnR7AWVFQ11XZ44UG1jYhcXuA5mz7sbuRrjrKSblAQdHHyqRE5X0zHtxuhocNsDQr/fVekRCws3Zngo84qfwR44GUVNPFs5OSJvNnBMHKcjgFG5bf3MBa3IJZ0RdrILNRYPpltdXq34L3Huvkp/9cByKe/SCibd2NhEmNg0DxxeKohH/TKlqanKZKWPCM=";
+const COFFRE = "v2.300000.qE1LxcNe58kQe718mix7NA==.V/R9KxbRQnjra9H2.YvfFO4JC/UY2tSRE+Qpy7A/Ntp0IaODwuxgal+mNhLxQWAj6WSED1Z+kIJItxYXP5k6ohPWWNxnaFFmdfnvNR/k5tpPOZz0YWt5KozWiUr54DlNFkSONZTTfHhRSOB3NzE1CFOeaF4GRPk0cmO5iWXrNWtUNn2wLoY3gE7a/Ma6lIydEchnOX3c8YdD1gd1TWJv+6CaPoAh/wDvJpv5EpBUVNEJGW8ogrWKCEaN6h1filTqv3Kw55V0=";
 const QUESTION = "Quelle est sa couleur préférée ?";
 
 /* ------------------------------------------------------------------ */
@@ -518,10 +521,11 @@ function renderList(){
 function majSub(n, trajets){
   const mot = trajets ? (n>1?"trajets":"trajet") : (n>1?"périodes":"période");
   const d = STATE.jours;
-  const maj = STATE.majSource ? ` · mis à jour le ${dateHeure(STATE.majSource)}` : "";
   document.getElementById("sub").textContent =
-    `${n} ${mot}${maj} · du ${libelleDate(d[0].date).replace(/^\S+ /,"")} ${dparts(d[0].date).y}` +
+    `${n} ${mot} · du ${libelleDate(d[0].date).replace(/^\S+ /,"")} ${dparts(d[0].date).y}` +
     ` au ${libelleDate(d[d.length-1].date).replace(/^\S+ /,"")} ${dparts(d[d.length-1].date).y}`;
+  document.getElementById("maj").textContent = STATE.majSource
+    ? `Dernière mise à jour du planning : ${dateHeure(STATE.majSource)}` : "";
 }
 
 function allerAAujourdhui(doux){
@@ -781,6 +785,7 @@ function diagnostic(essais){
 async function charger(liste){
   if(!liste.length){ setup(); return; }
   document.getElementById("sub").textContent = "Chargement du planning…";
+  document.getElementById("maj").textContent = "";
   const essais=[];
   for(const src of liste){
     try{
@@ -800,6 +805,7 @@ async function charger(liste){
     }
   }
   document.getElementById("sub").textContent = "Planning momentanément indisponible";
+  document.getElementById("maj").textContent = "";
   diagnostic(essais);
 }
 
