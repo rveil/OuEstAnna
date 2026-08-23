@@ -16,7 +16,7 @@
   --marie:#1b5fa8; --raph:#bf2318; --tous:#7a2e9e; --gp:#2f7a4d; --def:#7a7a72;
   --marie-bg:#e7f0fa; --raph-bg:#fbebe9; --tous-bg:#f3eafa; --gp-bg:#e8f3ec; --def-bg:#efefea;
   --lieu-base:#0e8fa0; --lieu-paris:#c2700a; --lieu-out:#c4147a;
-  --accent:#1b1b19;
+  --bar-bg:rgba(246,246,244,.93);
 }
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
@@ -25,11 +25,12 @@
     --marie:#79b4f0; --raph:#f0857a; --tous:#c79ae8; --gp:#5cc98a; --def:#9a9a92;
     --marie-bg:#16263a; --raph-bg:#33201d; --tous-bg:#281a33; --gp-bg:#152a1f; --def-bg:#262623;
     --lieu-base:#4fc3d4; --lieu-paris:#e5a463; --lieu-out:#f37ac0;
-    --accent:#f0f0ec;
+    --bar-bg:rgba(18,18,17,.93);
   }
 }
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
+html{scroll-behavior:smooth}
 body{
   background:var(--bg); color:var(--ink);
   font:400 16px/1.55 ui-sans-serif,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
@@ -39,95 +40,104 @@ body{
 .wrap{max-width:44rem;margin:0 auto;padding:0 1rem}
 
 /* ---------------- en-tête ---------------- */
-header{padding:2.5rem 0 1.25rem}
+header{padding:2.2rem 0 1.1rem}
 h1{font-size:1.5rem;line-height:1.15;letter-spacing:-.02em;margin:0 0 .3rem;font-weight:650}
 .sub{color:var(--ink-3);font-size:.82rem;margin:0}
 
 /* ---------------- carte "maintenant" ---------------- */
 .now{
   background:var(--card);border:1px solid var(--line);border-radius:16px;
-  padding:1.15rem 1.25rem;box-shadow:var(--shadow);margin:0 0 2rem;
+  padding:1.15rem 1.25rem;box-shadow:var(--shadow);margin:0 0 1.4rem;
 }
 .now .lab{font-size:.7rem;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3);margin:0 0 .5rem}
 .now .who{font-size:1.5rem;font-weight:650;letter-spacing:-.02em;margin:0;line-height:1.2}
 .now .where{font-size:1rem;color:var(--ink-2);margin:.15rem 0 0}
 .now .note{font-size:.85rem;color:var(--ink-3);margin:.55rem 0 0;font-style:italic}
 .now .until{font-size:.8rem;color:var(--ink-3);margin:.6rem 0 0;padding-top:.6rem;border-top:1px solid var(--line-2)}
-
-/* ---------------- sections ---------------- */
-h2{
-  font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);
-  font-weight:600;margin:2.2rem 0 .7rem;
+.now .goto{margin:.6rem 0 0}
+.now .goto button{
+  font:inherit;font-size:.78rem;padding:.3rem .7rem;border-radius:999px;cursor:pointer;
+  border:1px solid var(--line);background:var(--bg);color:var(--ink-2);
 }
-h2:first-of-type{margin-top:0}
 
-/* ---------------- lignes ---------------- */
-.list{display:flex;flex-direction:column;gap:.4rem}
-.row{
-  display:flex;gap:.85rem;align-items:flex-start;
-  background:var(--card);border:1px solid var(--line);border-radius:12px;
-  padding:.7rem .85rem;
+/* ---------------- barre d'outils collante ---------------- */
+.tools{
+  position:sticky;top:0;z-index:20;
+  background:var(--bar-bg);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line);
+  margin:0 -1rem 1.1rem;padding:.6rem 1rem .5rem;
 }
-.row.past{opacity:.45}
-.row .bar{width:3px;border-radius:3px;align-self:stretch;flex:0 0 3px;background:var(--def)}
-.row .body{flex:1;min-width:0}
-.row .when{font-size:.78rem;color:var(--ink-3);margin:0 0 .1rem;font-variant-numeric:tabular-nums}
-.row .who{font-size:1rem;font-weight:600;margin:0;letter-spacing:-.01em}
-.row .who .at{font-weight:400;color:var(--ink-2)}
-.at-base{color:var(--lieu-base)!important}
-.at-paris{color:var(--lieu-paris)!important}
-.at-out{color:var(--lieu-out)!important}
-.m-def .who,.m-def .tag,.legend .m-def{font-style:italic}
-.row .note{font-size:.8rem;color:var(--ink-3);margin:.2rem 0 0}
-.tag{
-  flex:0 0 auto;font-size:.66rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;
-  padding:.2rem .45rem;border-radius:6px;align-self:center;white-space:nowrap;
-}
-.m-marie{--c:var(--marie);--cb:var(--marie-bg)}
-.m-raph{--c:var(--raph);--cb:var(--raph-bg)}
-.m-tous{--c:var(--tous);--cb:var(--tous-bg)}
-.m-gp{--c:var(--gp);--cb:var(--gp-bg)}
-.m-def{--c:var(--def);--cb:var(--def-bg)}
-.row .bar{background:var(--c,var(--def))}
-.row .who{color:var(--c,var(--ink))}
-.tag{background:var(--cb,var(--def-bg));color:var(--c,var(--def))}
-
-/* ---------------- recherche ---------------- */
-.tools{margin:0 0 1.5rem}
-.search{position:relative;margin:0 0 .55rem}
+.search{position:relative;margin:0 0 .45rem}
 .search input{
-  width:100%;font:inherit;font-size:1rem;padding:.62rem .8rem .62rem 2.25rem;
-  background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:11px;
+  width:100%;font:inherit;font-size:1rem;padding:.5rem .8rem .5rem 2.15rem;
+  background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:10px;
   -webkit-appearance:none;appearance:none;
 }
 .search input::placeholder{color:var(--ink-3)}
 .search input:focus{outline:none;border-color:var(--ink-3)}
-.search svg{position:absolute;left:.72rem;top:50%;transform:translateY(-50%);
-  width:.95rem;height:.95rem;stroke:var(--ink-3);fill:none;stroke-width:2;pointer-events:none}
-.search button{position:absolute;right:.5rem;top:50%;transform:translateY(-50%);
+.search svg{position:absolute;left:.7rem;top:50%;transform:translateY(-50%);
+  width:.9rem;height:.9rem;stroke:var(--ink-3);fill:none;stroke-width:2;pointer-events:none}
+.search button{position:absolute;right:.45rem;top:50%;transform:translateY(-50%);
   border:0;background:var(--line-2);color:var(--ink-2);border-radius:50%;
-  width:1.45rem;height:1.45rem;font-size:.95rem;line-height:1;cursor:pointer;padding:0}
-.chips{display:flex;gap:.35rem;overflow-x:auto;padding-bottom:.2rem;scrollbar-width:none}
-.chips::-webkit-scrollbar{display:none}
-.chips button{
-  flex:0 0 auto;font:inherit;font-size:.78rem;padding:.32rem .68rem;border-radius:999px;
-  cursor:pointer;background:var(--card);border:1px solid var(--line);color:var(--ink-2);
+  width:1.35rem;height:1.35rem;font-size:.9rem;line-height:1;cursor:pointer;padding:0}
+.frow{display:flex;align-items:center;gap:.3rem;overflow-x:auto;scrollbar-width:none;
+  padding:.11rem 0;-webkit-overflow-scrolling:touch}
+.frow::-webkit-scrollbar{display:none}
+.frow > b{
+  flex:0 0 auto;font-size:.62rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--ink-3);width:4.4rem;
 }
-.chips button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-.empty{color:var(--ink-3);font-size:.88rem;padding:1.1rem 0;margin:0}
+.frow button{
+  flex:0 0 auto;font:inherit;font-size:.74rem;padding:.22rem .58rem;border-radius:999px;
+  cursor:pointer;background:var(--card);border:1px solid var(--line);color:var(--ink-2);
+  white-space:nowrap;
+}
+.frow button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+@media (max-width:640px){
+  .frow{-webkit-mask-image:linear-gradient(to right,#000 88%,transparent);
+        mask-image:linear-gradient(to right,#000 88%,transparent)}
+}
+
+/* ---------------- lignes ---------------- */
+h2{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);
+  font-weight:600;margin:1.4rem 0 .7rem}
+.list{display:flex;flex-direction:column;gap:.4rem}
+.row{
+  display:flex;gap:.85rem;align-items:flex-start;
+  background:var(--card);border:1px solid var(--line);border-radius:12px;
+  padding:.7rem .85rem;scroll-margin-top:var(--bar-h,9.5rem);
+}
+.row.past{opacity:.42}
+.row.ici{border-color:var(--c,var(--ink-3));box-shadow:0 0 0 1px var(--c,var(--ink-3))}
+.row .bar{width:3px;border-radius:3px;align-self:stretch;flex:0 0 3px;background:var(--c,var(--def))}
+.row .body{flex:1;min-width:0}
+.row .when{font-size:.78rem;color:var(--ink-3);margin:0 0 .1rem;font-variant-numeric:tabular-nums}
+.row .who{font-size:1rem;font-weight:600;margin:0;letter-spacing:-.01em;color:var(--c,var(--ink))}
+.row .who .at{font-weight:400;color:var(--ink-2)}
+.at-base{color:var(--lieu-base)!important}
+.at-paris{color:var(--lieu-paris)!important}
+.at-out{color:var(--lieu-out)!important}
+.row .note{font-size:.8rem;color:var(--ink-3);margin:.2rem 0 0}
+.tag{
+  flex:0 0 auto;font-size:.66rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;
+  padding:.2rem .45rem;border-radius:6px;align-self:center;white-space:nowrap;
+  background:var(--cb,var(--def-bg));color:var(--c,var(--def));
+}
+.tag.jour{background:var(--ink);color:var(--bg)}
+.m-marie{--c:var(--marie);--cb:var(--marie-bg)}
+.m-raph{--c:var(--raph);--cb:var(--raph-bg)}
+.m-tous{--c:var(--tous);--cb:var(--tous-bg)}
+.m-gp{--c:var(--gp);--cb:var(--gp-bg)}
+.m-def{--c:var(--def);--cb:var(--def-bg);font-style:italic}
+.m-def .note,.m-def .when{font-style:normal}
+.fleche{color:var(--ink-3);font-weight:400}
 
 /* ---------------- mois ---------------- */
-.month{margin:1.6rem 0 .5rem;font-size:.95rem;font-weight:650;letter-spacing:-.01em}
-details>summary{
-  cursor:pointer;list-style:none;font-size:.8rem;color:var(--ink-3);
-  padding:.55rem 0;user-select:none;
-}
-details>summary::-webkit-details-marker{display:none}
-details>summary::before{content:"▸ ";display:inline-block;transition:transform .15s}
-details[open]>summary::before{content:"▾ "}
+.month{margin:1.5rem 0 .5rem;font-size:.95rem;font-weight:650;letter-spacing:-.01em;
+  scroll-margin-top:var(--bar-h,9.5rem)}
 
 /* ---------------- pied ---------------- */
-footer{margin-top:2.5rem;padding-top:1.2rem;border-top:1px solid var(--line);
+footer{margin-top:2.4rem;padding-top:1.2rem;border-top:1px solid var(--line);
   font-size:.75rem;color:var(--ink-3);line-height:1.6}
 .legend{display:flex;flex-wrap:wrap;gap:.4rem;margin:0 0 .9rem}
 .legend span{font-size:.68rem;font-weight:600;padding:.2rem .45rem;border-radius:6px}
@@ -139,6 +149,7 @@ footer{margin-top:2.5rem;padding-top:1.2rem;border-top:1px solid var(--line);
 .msg code{background:var(--line-2);padding:.1rem .3rem;border-radius:4px;
   font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.82em;word-break:break-all}
 .msg ol{margin:.5rem 0 0;padding-left:1.2rem} .msg li{margin:.35rem 0}
+.empty{color:var(--ink-3);font-size:.88rem;padding:1.1rem 0;margin:0}
 .skel{height:1rem;background:var(--line-2);border-radius:5px;animation:p 1.4s ease-in-out infinite}
 @keyframes p{0%,100%{opacity:.5}50%{opacity:.9}}
 </style>
@@ -164,50 +175,50 @@ footer{margin-top:2.5rem;padding-top:1.2rem;border-top:1px solid var(--line);
 </div>
 <script>
 /* ==================================================================
-   1. CONFIGURATION — la seule ligne à modifier
+   1. CONFIGURATION
    ==================================================================
-   Collez ici l'adresse CSV publiée de l'onglet « Données web ».
-   Dans Google Sheets : Fichier → Partager → Publier sur le web
-     · Onglet à publier : « Données web »
-     · Format : Valeurs séparées par des virgules (.csv)
-   Puis copiez l'adresse obtenue entre les guillemets ci-dessous.
+   Adresse CSV publiée de l'onglet « Données web ».
+   Google Sheets : Fichier → Partager → Publier sur le web
+     · Onglet : « Données web »   · Format : .csv
    ================================================================== */
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSq70Ble2mZGcGvPZ8ecVqAaiYPQaF1ZIky_UbYt246_VBD-6bkQzUhB3jCkqbhKVvG7VMNAjOWH2gN/pub?gid=1504266455&single=true&output=csv";
 
 /* Secours : identifiant du tableur tel qu'il apparaît dans l'adresse d'édition
    https://docs.google.com/spreadsheets/d/CET_IDENTIFIANT/edit#gid=1504266455
-   Il sert à interroger Google par une seconde voie (gviz) si la première échoue.
    Le tableur doit alors être partagé en « Tout utilisateur disposant du lien — Lecteur ». */
 const SHEET_ID = "";
 const SHEET_GID = "1504266455";
 
 /* ------------------------------------------------------------------ */
 const P = new URLSearchParams(location.search);
-const URL_CSV = P.get("csv") || CSV_URL;
 
 const JOURS = {lun:"lundi",mar:"mardi",mer:"mercredi",jeu:"jeudi",ven:"vendredi",sam:"samedi",dim:"dimanche"};
-const JOURS_C = {lun:"lun",mar:"mar",mer:"mer",jeu:"jeu",ven:"ven",sam:"sam",dim:"dim"};
 const MOIS = ["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
 const MOIS_C = ["janv.","févr.","mars","avr.","mai","juin","juil.","août","sept.","oct.","nov.","déc."];
 
-const CLASSE = {
-  "Marie":"m-marie", "Raph":"m-raph", "Tous les 3":"m-tous", "Autres":"m-gp", "À définir":"m-def"
-};
-const LIBELLE = {
-  "Marie":"Avec Marie", "Raph":"Avec Raph", "Tous les 3":"Tous les 3",
-  "Autres":"Autres", "À définir":"À définir"
-};
+const CLASSE = {"Marie":"m-marie","Raph":"m-raph","Tous les 3":"m-tous","Autres":"m-gp","À définir":"m-def"};
+const LIBELLE = {"Marie":"Avec Marie","Raph":"Avec Raph","Tous les 3":"Tous les 3",
+                 "Autres":"Autres","À définir":"À définir"};
 const BASE = "Corenc", PARIS = "Paris", NONDEF = "À définir";
+
 function classeLieu(o){
   if(!o || o===NONDEF) return "";
   if(o===BASE) return "at-base";
   if(o===PARIS) return "at-paris";
   return "at-out";
 }
+function categorieLieu(o){
+  if(o===BASE) return "Corenc";
+  if(o===PARIS) return "Paris";
+  if(o===NONDEF) return NONDEF;
+  return "Autres";
+}
+function norm(s){ return String(s).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,""); }
+function esc(s){ return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
 
 /* ---------- CSV ---------- */
 function parseCSV(t){
-  t = t.replace(/^﻿/,"");
+  t = t.replace(/^\uFEFF/,"");
   const rows=[]; let row=[], cur="", q=false;
   for(let i=0;i<t.length;i++){
     const c=t[i];
@@ -222,7 +233,6 @@ function parseCSV(t){
   if(cur!==""||row.length){ row.push(cur); rows.push(row); }
   return rows.filter(r=>r.some(v=>v.trim()!==""));
 }
-
 function toObjects(rows){
   const h = rows[0].map(s=>s.trim());
   const ix = n => h.indexOf(n);
@@ -230,69 +240,25 @@ function toObjects(rows){
         iC=ix("Commentaire"), iT=ix("Type");
   if(iD<0||iQ<0) throw new Error("colonnes introuvables");
   return rows.slice(1).map(r=>({
-    date:(r[iD]||"").trim(),
-    jour:(r[iJ]||"").trim(),
-    qui:(r[iQ]||"").trim(),
-    ou:(r[iO]||"").trim(),
-    com:(r[iC]||"").trim(),
-    typ:(r[iT]||"").trim()
+    date:(r[iD]||"").trim(), jour:(r[iJ]||"").trim(), qui:(r[iQ]||"").trim(),
+    ou:(r[iO]||"").trim(), com:(r[iC]||"").trim(), typ:(r[iT]||"").trim()
   })).filter(d=>/^\d{4}-\d{2}-\d{2}$/.test(d.date));
-}
-
-/* ---------- regroupement ---------- */
-// Un jour est "notable" s'il sort de l'ordinaire (école, chez Marie, à Corenc).
-function notable(d){
-  if(d.typ !== "classe") return true;                    // week-end, vacances, jour férié
-  if(d.qui === NONDEF && d.ou === NONDEF) return false;  // jour d'école pas encore renseigné
-  return d.qui !== "Marie" || d.ou !== BASE;             // jour d'école qui sort de l'ordinaire
-}
-function jourNum(s){ return Math.round(Date.parse(s+"T12:00:00Z")/86400000); }
-
-function grouper(days){
-  const out=[]; let cur=null;
-  const ajouteNotes = (b,com) => {
-    if(!com) return;
-    for(const part of com.split(" \u2013 ")){
-      const t = part.trim();
-      if(t && !b.notes.includes(t)) b.notes.push(t);
-    }
-  };
-  for(const d of days){
-    if(!notable(d)){ cur=null; continue; }
-    const key = d.qui+"|"+d.ou;
-    if(cur && cur.key===key && jourNum(d.date)===jourNum(cur.fin)+1){
-      cur.fin = d.date; cur.jours.push(d); ajouteNotes(cur,d.com);
-    } else {
-      cur = {key, qui:d.qui, ou:d.ou, notes:[], debut:d.date, fin:d.date, jours:[d]};
-      ajouteNotes(cur,d.com);
-      out.push(cur);
-    }
-  }
-  for(const b of out){
-    // sur une periode de plusieurs jours, le nom du ferie est du bruit ; seul le fond compte
-    let n = b.jours.length>1 ? b.notes.filter(t=>!/\(férié\)$/.test(t)) : b.notes;
-    b.notesToutes = b.notes;
-    b.com = n.slice(0,3).join(" \u00b7 ") + (n.length>3 ? " \u00b7 …" : "");
-  }
-  return out;
 }
 
 /* ---------- dates ---------- */
 function dparts(s){ const [y,m,j]=s.split("-").map(Number); return {y,m:m-1,j}; }
+function jourNum(s){ return Math.round(Date.parse(s+"T12:00:00Z")/86400000); }
 function libelleDate(s,court){
   const {y,m,j}=dparts(s);
   const jj = new Date(Date.UTC(y,m,j)).getUTCDay();
-  const noms = ["dim","lun","mar","mer","jeu","ven","sam"];
-  const jn = court ? noms[jj] : JOURS[noms[jj]];
-  return `${jn} ${j===1?"1er":j} ${court?MOIS_C[m]:MOIS[m]}`;
+  const noms=["dim","lun","mar","mer","jeu","ven","sam"];
+  return `${court?noms[jj]:JOURS[noms[jj]]} ${j===1?"1er":j} ${court?MOIS_C[m]:MOIS[m]}`;
 }
 function libellePeriode(b){
   const a=dparts(b.debut), z=dparts(b.fin);
   if(b.debut===b.fin) return cap(libelleDate(b.debut));
-  const g = cap(libelleDate(b.debut,true));
-  const d = libelleDate(b.fin,true);
   const an = (z.y!==a.y) ? " "+z.y : "";
-  return `${g} → ${d}${an}`;
+  return `${cap(libelleDate(b.debut,true))} → ${libelleDate(b.fin,true)}${an}`;
 }
 function cap(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
 function aujourdhui(){
@@ -300,104 +266,268 @@ function aujourdhui(){
   return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,"0")}-${String(n.getDate()).padStart(2,"0")}`;
 }
 
-/* ---------- rendu ---------- */
-function ligne(b, today){
-  const cl = CLASSE[b.qui] || "m-def";
-  const passe = b.fin < today ? " past" : "";
-  const lieu = (b.ou && b.ou!==NONDEF)
-      ? `<span class="at ${classeLieu(b.ou)}"> · ${esc(b.ou)}</span>`
-      : `<span class="at" style="font-style:italic"> · lieu à définir</span>`;
-  const note = b.com ? `<p class="note">${esc(b.com)}</p>` : "";
-  const nb = b.jours.length;
-  const tag = nb>1 ? `<span class="tag">${nb} j</span>` : "";
-  return `<div class="row ${cl}${passe}">
-    <div class="bar"></div>
-    <div class="body">
-      <p class="when">${esc(libellePeriode(b))}</p>
-      <p class="who">${esc(LIBELLE[b.qui]||b.qui)}${lieu}</p>
-      ${note}
-    </div>${tag}
-  </div>`;
-}
-function esc(s){ return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
-
-function norm(s){ return String(s).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,""); }
-
-const STATE = {blocs:[], today:"", chip:""};
-
-function hayFor(b){
-  const a=dparts(b.debut), z=dparts(b.fin);
-  const parts=[LIBELLE[b.qui]||b.qui, b.qui, b.ou, (b.notesToutes||[]).join(" "), libellePeriode(b),
-               MOIS[a.m]+" "+a.y, MOIS[z.m]+" "+z.y];
-  for(const d of b.jours){ parts.push(d.typ, JOURS[d.jour]||d.jour); }
-  if(b.ou===NONDEF) parts.push("lieu a definir");
-  return norm(parts.join(" "));
+/* ==================================================================
+   2. REGROUPEMENT
+   Deux lectures du même planning :
+   · « complet »     — tous les jours, coupés quand change (avec qui, où, vacances ou non)
+   · « remarquable » — seulement ce qui sort d'une journée d'école ordinaire
+   ================================================================== */
+function notable(d){
+  if(d.typ !== "classe") return true;
+  if(d.qui === NONDEF && d.ou === NONDEF) return false;
+  return d.qui !== "Marie" || d.ou !== BASE;
 }
 
-function parMoisHTML(blocs, today){
-  const parMois=new Map();
-  for(const b of blocs){
-    const {y,m}=dparts(b.debut);
-    const k=`${y}-${String(m+1).padStart(2,"0")}`;
-    if(!parMois.has(k)) parMois.set(k,[]);
-    parMois.get(k).push(b);
+function grouper(days, cleFn, gardeFn){
+  const out=[]; let cur=null;
+  const ajoute = (b,com) => {
+    if(!com) return;
+    for(const part of com.split(" – ")){
+      const t=part.trim();
+      if(t && !b.notes.includes(t)) b.notes.push(t);
+    }
+  };
+  for(const d of days){
+    if(gardeFn && !gardeFn(d)){ cur=null; continue; }
+    const key = cleFn(d);
+    if(cur && cur.key===key && jourNum(d.date)===jourNum(cur.fin)+1){
+      cur.fin=d.date; cur.jours.push(d); ajoute(cur,d.com);
+    } else {
+      cur={key, qui:d.qui, ou:d.ou, notes:[], debut:d.date, fin:d.date, jours:[d]};
+      ajoute(cur,d.com);
+      out.push(cur);
+    }
   }
-  let out="";
-  for(const [k,bs] of parMois){
-    const [y,m]=k.split("-").map(Number);
-    out += `<p class="month">${cap(MOIS[m-1])} ${y}</p><div class="list">${
-      bs.map(b=>ligne(b,today)).join("")}</div>`;
+  for(const b of out){
+    const n = b.jours.length>1 ? b.notes.filter(t=>!/\(férié\)$/.test(t)) : b.notes;
+    b.notesToutes = b.notes;
+    b.com = n.slice(0,3).join(" · ") + (n.length>3 ? " · …" : "");
+    b.types = new Set(b.jours.map(d=>d.typ));
+    const a=dparts(b.debut), z=dparts(b.fin);
+    b.hay = norm([LIBELLE[b.qui]||b.qui, b.qui, b.ou, b.notesToutes.join(" "), libellePeriode(b),
+                  MOIS[a.m]+" "+a.y, MOIS[z.m]+" "+z.y,
+                  ...b.jours.map(d=>d.typ+" "+(JOURS[d.jour]||d.jour)),
+                  b.ou===NONDEF?"lieu a definir":""].join(" "));
   }
   return out;
 }
 
-function filtrer(){
-  const q = norm(document.getElementById("q").value.trim());
-  const f = STATE.chip;
-  return STATE.blocs.filter(b=>{
-    if((f==="Marie"||f==="Raph") && b.qui!==f) return false;
-    if(f==="vacances" && !b.types.has("vacances")) return false;
-    if(f==="weekend" && (b.types.has("vacances") || !b.types.has("week-end"))) return false;
-    if(q && !b.hay.includes(q)) return false;
-    return true;
+/* Trajets : chaque changement de lieu entre deux périodes consécutives.
+   · le lieu précédent est Corenc            -> Aller   (date : 1er jour du séjour)
+   · le lieu suivant est Corenc              -> Retour  (date : dernier jour du séjour)
+   · ni l'un ni l'autre n'est Corenc         -> Transit (une seule ligne, deux dates possibles) */
+function trajetsDepuis(complets){
+  const out=[];
+  for(let i=0;i<complets.length-1;i++){
+    const a=complets[i], b=complets[i+1];
+    if(a.ou === b.ou) continue;                       // même lieu : pas de trajet
+    if(a.ou === BASE && b.ou === BASE) continue;
+    let sens, date, date2=null, quis, ous, note;
+    if(a.ou === BASE){
+      sens="Aller";  date=b.debut; quis=[b.qui]; ous=[b.ou];
+      note = esc(LIBELLE[b.qui]||b.qui);
+    } else if(b.ou === BASE){
+      sens="Retour"; date=a.fin;   quis=[a.qui]; ous=[a.ou];
+      note = esc(LIBELLE[a.qui]||a.qui);
+    } else {
+      sens="Transit"; date=a.fin; date2=b.debut; quis=[a.qui,b.qui]; ous=[a.ou,b.ou];
+      note = a.qui===b.qui ? esc(LIBELLE[a.qui]||a.qui)
+           : `Passation : ${esc(a.qui)} → ${esc(b.qui)}`;
+    }
+    out.push({sens, date, date2, de:a.ou, vers:b.ou, quis, ous, note,
+      hay: norm([sens, a.ou, b.ou, a.qui, b.qui, LIBELLE[a.qui]||"", LIBELLE[b.qui]||"", note,
+                 libelleDate(date), date2?libelleDate(date2):"",
+                 MOIS[dparts(date).m]+" "+dparts(date).y,
+                 a.notesToutes.join(" "), b.notesToutes.join(" ")].join(" "))});
+  }
+  return out.sort((x,y)=> x.date<y.date?-1:1);
+}
+/* ==================================================================
+   3. FILTRES
+   ================================================================== */
+const PERIODES = [
+  {id:"tout",    lab:"Tout",      seul:true},
+  {id:"we",      lab:"Week-ends"},
+  {id:"vac",     lab:"Vacances"},
+  {id:"trajets", lab:"Trajets",   seul:true},
+];
+const F_QUI = ["Raph","Marie","Tous les 3","Autres",NONDEF];
+const F_QUI_LAB = {"Raph":"Raph","Marie":"Marie","Tous les 3":"Tous les 3",
+                   "Autres":"Autres",[NONDEF]:NONDEF};
+const F_OU  = ["Paris","Corenc","Autres",NONDEF];
+
+const STATE = {today:"", per:new Set(["we","vac"]), qui:new Set(), ou:new Set(),
+               complets:[], events:[], trajets:[], premierRendu:true};
+
+function sourceBlocs(){
+  if(STATE.per.has("tout")) return STATE.complets;
+  const we  = STATE.per.has("we"), vac = STATE.per.has("vac");
+  return STATE.events.filter(b=>{
+    const estVac = b.types.has("vacances");
+    if(vac && estVac) return true;
+    if(we && !estVac && (b.types.has("week-end")||b.types.has("férié"))) return true;
+    return false;
   });
+}
+function passeQuiOu(quis, ous){
+  if(STATE.qui.size && !quis.some(q=>STATE.qui.has(q))) return false;
+  if(STATE.ou.size && !ous.some(o=>STATE.ou.has(categorieLieu(o)))) return false;
+  return true;
+}
+function requete(){ const e=document.getElementById("q"); return e ? norm(e.value.trim()) : ""; }
+
+function elements(){
+  const q = requete();
+  if(STATE.per.has("trajets")){
+    return STATE.trajets.filter(t=> passeQuiOu(t.quis,t.ous) && (!q || t.hay.includes(q)));
+  }
+  return sourceBlocs().filter(b=> passeQuiOu([b.qui],[b.ou]) && (!q || b.hay.includes(q)));
+}
+
+/* ==================================================================
+   4. RENDU
+   ================================================================== */
+function ligneBloc(b){
+  const cl = CLASSE[b.qui] || "m-def";
+  const ici = b.debut<=STATE.today && STATE.today<=b.fin;
+  const passe = b.fin < STATE.today ? " past" : "";
+  const lieu = (b.ou && b.ou!==NONDEF)
+      ? `<span class="at ${classeLieu(b.ou)}"> · ${esc(b.ou)}</span>`
+      : `<span class="at" style="font-style:italic"> · lieu à définir</span>`;
+  const nb = b.jours.length;
+  const tag = ici ? `<span class="tag jour">Aujourd'hui</span>`
+                  : (nb>1 ? `<span class="tag">${nb} j</span>` : "");
+  return `<div class="row ${cl}${passe}${ici?" ici":""}"${ici?' id="ici"':""}>
+    <div class="bar"></div>
+    <div class="body">
+      <p class="when">${esc(libellePeriode(b))}</p>
+      <p class="who">${esc(LIBELLE[b.qui]||b.qui)}${lieu}</p>
+      ${b.com?`<p class="note">${esc(b.com)}</p>`:""}
+    </div>${tag}
+  </div>`;
+}
+
+function ligneTrajet(t){
+  const cl = CLASSE[t.quis[t.quis.length-1]] || "m-def";
+  const finT = t.date2 || t.date;
+  const ici = t.date===STATE.today || finT===STATE.today;
+  const passe = finT < STATE.today ? " past" : "";
+  const nom = o => o===NONDEF
+      ? `<span class="at" style="font-style:italic">lieu à définir</span>`
+      : `<span class="at ${classeLieu(o)}">${esc(o)}</span>`;
+  const quand = t.date2
+      ? `${cap(libelleDate(t.date,true))} <span class="fleche">ou</span> ${libelleDate(t.date2,true)}`
+      : esc(cap(libelleDate(t.date)));
+  return `<div class="row ${cl}${passe}${ici?" ici":""}"${ici?' id="ici"':""}>
+    <div class="bar"></div>
+    <div class="body">
+      <p class="when">${quand}</p>
+      <p class="who">${nom(t.de)} <span class="fleche">→</span> ${nom(t.vers)}</p>
+      <p class="note">${t.note}</p>
+    </div><span class="tag">${esc(t.sens)}</span>
+  </div>`;
+}
+
+function parMois(items, dateDe, rendu){
+  const m=new Map();
+  for(const it of items){
+    const {y,m:mo}=dparts(dateDe(it));
+    const k=`${y}-${String(mo+1).padStart(2,"0")}`;
+    if(!m.has(k)) m.set(k,[]);
+    m.get(k).push(it);
+  }
+  let out="";
+  for(const [k,list] of m){
+    const [y,mo]=k.split("-").map(Number);
+    out += `<p class="month">${cap(MOIS[mo-1])} ${y}</p><div class="list">${
+      list.map(rendu).join("")}</div>`;
+  }
+  return out;
 }
 
 function renderList(){
-  const today = STATE.today;
-  const q = document.getElementById("q").value.trim();
+  const l = elements();
   const res = document.getElementById("results");
-  if(!q && !STATE.chip){
-    const prochains = STATE.blocs.filter(b=>b.debut>today).slice(0,8)
-                        .map(b=>ligne(b,today)).join("");
-    res.innerHTML = (prochains?`<h2>À venir</h2><div class="list">${prochains}</div>`:"")
-      + `<details><summary>Voir tout le planning</summary>${parMoisHTML(STATE.blocs,today)}</details>`;
+  const trajets = STATE.per.has("trajets");
+  if(!l.length){
+    res.innerHTML = `<p class="empty">Rien ne correspond à cette combinaison de filtres.</p>`;
+    majSub(0);
     return;
   }
-  const l = filtrer();
-  res.innerHTML = `<h2>${l.length} résultat${l.length>1?"s":""}</h2>`
-    + (l.length ? parMoisHTML(l,today)
-       : `<p class="empty">Rien ne correspond. Essayez « Noël », « Paris », « ski », « mars 2027 »…</p>`);
+  res.innerHTML = parMois(l, trajets?(t=>t.date):(b=>b.debut), trajets?ligneTrajet:ligneBloc);
+  majSub(l.length, trajets);
+}
+
+function majSub(n, trajets){
+  const mot = trajets ? (n>1?"trajets":"trajet") : (n>1?"périodes":"période");
+  const d = STATE.jours;
+  document.getElementById("sub").textContent =
+    `${n} ${mot} · du ${libelleDate(d[0].date).replace(/^\S+ /,"")} ${dparts(d[0].date).y}` +
+    ` au ${libelleDate(d[d.length-1].date).replace(/^\S+ /,"")} ${dparts(d[d.length-1].date).y}`;
+}
+
+function allerAAujourdhui(doux){
+  const el = document.getElementById("ici");
+  if(el) el.scrollIntoView({block:"start", behavior: doux?"smooth":"auto"});
+}
+
+/* ---------- barre d'outils ---------- */
+function barreHTML(){
+  const bp = PERIODES.map(p=>
+    `<button data-cat="per" data-v="${p.id}"${STATE.per.has(p.id)?' class="on"':""}>${p.lab}</button>`).join("");
+  const bq = F_QUI.map(v=>
+    `<button data-cat="qui" data-v="${esc(v)}">${esc(F_QUI_LAB[v])}</button>`).join("");
+  const bo = F_OU.map(v=>
+    `<button data-cat="ou" data-v="${esc(v)}">${esc(v)}</button>`).join("");
+  return `<div class="tools">
+    <div class="search">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+      <input id="q" type="search" autocomplete="off" enterkeyhint="search"
+             placeholder="Rechercher : Noël, Paris, ski, mars 2027…" aria-label="Rechercher">
+      <button id="clear" type="button" hidden aria-label="Effacer">×</button>
+    </div>
+    <div class="frow"><b>Périodes</b>${bp}</div>
+    <div class="frow"><b>Avec qui</b>${bq}</div>
+    <div class="frow"><b>Où ça</b>${bo}</div>
+  </div>`;
 }
 
 function initTools(){
   const q=document.getElementById("q"), clear=document.getElementById("clear");
-  const maj=()=>{ clear.hidden = !q.value; renderList(); };
+  const maj=()=>{ clear.hidden=!q.value; renderList(); };
   q.addEventListener("input", maj);
   q.addEventListener("keydown", e=>{ if(e.key==="Escape"){ q.value=""; maj(); } });
   clear.addEventListener("click", ()=>{ q.value=""; maj(); q.focus(); });
-  const chips=[...document.querySelectorAll(".chips button")];
-  for(const btn of chips) btn.addEventListener("click", ()=>{
-    STATE.chip = (STATE.chip===btn.dataset.f) ? "" : btn.dataset.f;
-    for(const b of chips) b.classList.toggle("on", (b.dataset.f||"")===STATE.chip);
-    renderList();
-  });
+
+  for(const btn of document.querySelectorAll(".frow button")){
+    btn.addEventListener("click", ()=>{
+      const cat=btn.dataset.cat, v=btn.dataset.v;
+      if(cat==="per"){
+        const seul = PERIODES.find(p=>p.id===v).seul;
+        if(seul){                                     // « Tout » et « Trajets » : exclusifs
+          STATE.per = new Set([v]);
+        } else {                                      // « Week-ends » et « Vacances » : cumulables
+          STATE.per.delete("tout"); STATE.per.delete("trajets");
+          STATE.per.has(v) ? STATE.per.delete(v) : STATE.per.add(v);
+          if(!STATE.per.size) STATE.per = new Set(["tout"]);
+        }
+        for(const b of document.querySelectorAll('[data-cat="per"]'))
+          b.classList.toggle("on", STATE.per.has(b.dataset.v));
+      } else {
+        const set = STATE[cat];
+        set.has(v) ? set.delete(v) : set.add(v);
+        btn.classList.toggle("on", set.has(v));
+      }
+      renderList();
+    });
+  }
 }
 
-function carteNow(days){
-  const today=STATE.today, blocs=STATE.blocs;
+function carteNow(){
+  const today=STATE.today, blocs=STATE.complets;
   const enCours = blocs.find(b=> b.debut<=today && today<=b.fin);
   const suivant = blocs.find(b=> b.debut>today);
+  const bouton = enCours ? `<p class="goto"><button type="button" id="jump">Voir dans la liste</button></p>` : "";
   if(enCours){
     const reste = jourNum(enCours.fin)-jourNum(today);
     return `<div class="now ${CLASSE[enCours.qui]||"m-def"}">
@@ -409,13 +539,14 @@ function carteNow(days){
       <p class="until">${reste===0?"Jusqu'à ce soir":"Jusqu'au "+libelleDate(enCours.fin)}${
         suivant?` · ensuite ${esc(LIBELLE[suivant.qui]||suivant.qui)}${
           suivant.ou&&suivant.ou!==NONDEF?" à "+esc(suivant.ou):""}, ${esc(libellePeriode(suivant))}`:""
-      }</p></div>`;
+      }</p>${bouton}</div>`;
   }
-  const avant = today < days[0].date, apres = today > days[days.length-1].date;
+  const d=STATE.jours;
+  const avant = today < d[0].date, apres = today > d[d.length-1].date;
   const cl = apres ? "m-def" : (suivant ? (CLASSE[suivant.qui]||"m-def") : "m-marie");
   const titre = avant ? "Le planning n'a pas encore commencé"
               : apres ? "Le planning s'arrête ici" : "Semaine d'école";
-  const sous  = avant ? "Il démarre le "+libelleDate(days[0].date)
+  const sous  = avant ? "Il démarre le "+libelleDate(d[0].date)
               : apres ? "À prolonger avec l'année scolaire suivante" : "Chez Marie, à Corenc";
   return `<div class="now ${cl}">
     <p class="lab">Aujourd'hui</p>
@@ -429,80 +560,76 @@ function carteNow(days){
 
 function rendre(days){
   STATE.today = aujourdhui();
-  STATE.blocs = grouper(days);
-  for(const b of STATE.blocs){
-    b.types = new Set(b.jours.map(d=>d.typ));
-    b.hay = hayFor(b);
-  }
+  STATE.jours = days;
+  STATE.complets = grouper(days, d=> d.qui+"|"+d.ou+"|"+(d.typ==="vacances"?"V":"S"));
+  STATE.events   = grouper(days, d=> d.qui+"|"+d.ou, notable);
+  STATE.trajets  = trajetsDepuis(STATE.complets);
 
-  document.getElementById("app").innerHTML = carteNow(days) + `
-    <div class="tools">
-      <div class="search">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
-        <input id="q" type="search" autocomplete="off" enterkeyhint="search"
-               placeholder="Rechercher : Noël, Paris, ski, mars 2027…" aria-label="Rechercher une période">
-        <button id="clear" type="button" hidden aria-label="Effacer">×</button>
-      </div>
-      <div class="chips">
-        <button data-f="" class="on">Tout</button>
-        <button data-f="Marie">Avec Marie</button>
-        <button data-f="Raph">Avec Raph</button>
-        <button data-f="vacances">Vacances</button>
-        <button data-f="weekend">Week-ends</button>
-      </div>
-    </div>
-    <div id="results"></div>`;
-
+  document.getElementById("app").innerHTML = carteNow() + barreHTML() + `<div id="results"></div>`;
   initTools();
   renderList();
 
-  document.getElementById("legend").innerHTML = Object.keys(CLASSE).map(q=>
-    `<span class="${CLASSE[q]}" style="background:var(--cb);color:var(--c)">${esc(LIBELLE[q])}</span>`).join("");
-  const maj = new Date();
+  const bar=document.querySelector(".tools");
+  const mesure=()=>{ if(bar) document.documentElement.style.setProperty(
+      "--bar-h", (bar.getBoundingClientRect().height+12)+"px"); };
+  mesure(); window.addEventListener("resize", mesure);
+
+  const jump=document.getElementById("jump");
+  if(jump) jump.addEventListener("click", ()=>allerAAujourdhui(true));
+  if(STATE.premierRendu){
+    STATE.premierRendu=false;
+    requestAnimationFrame(()=>allerAAujourdhui(false));
+  }
+
+  document.getElementById("legend").innerHTML = Object.keys(CLASSE).map(k=>
+    `<span class="${CLASSE[k]}" style="background:var(--cb);color:var(--c)">${esc(LIBELLE[k])}</span>`).join("");
+  const maj=new Date();
   document.getElementById("foot").innerHTML =
-    `Les week-ends, vacances et jours fériés uniquement — les semaines d'école ordinaires (chez Marie, à Corenc) ne sont pas listées.<br>
-     Planning tenu à jour par Marie et Raph. Page actualisée le ${maj.toLocaleDateString("fr-FR")} à ${maj.toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"})}.`;
-  document.getElementById("sub").textContent =
-    `${STATE.blocs.length} périodes · du ${libelleDate(days[0].date).replace(/^\S+ /,"")} ${dparts(days[0].date).y} au ${libelleDate(days[days.length-1].date).replace(/^\S+ /,"")} ${dparts(days[days.length-1].date).y}`;
+    `« Trajets » liste chaque changement de lieu : aller depuis Corenc, retour vers Corenc,
+     ou transit entre deux séjours — auquel cas les deux dates possibles sont indiquées.<br>
+     Planning tenu à jour par Marie et Raph. Page actualisée le ${maj.toLocaleDateString("fr-FR")} à ${
+       maj.toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"})}.`;
 }
 
-/* ---------- démarrage ---------- */
+/* ==================================================================
+   5. CHARGEMENT
+   ================================================================== */
 function sources(){
   const q = P.get("csv");
   if(q) return [{nom:"adresse passée en paramètre", url:q}];
   const s = P.get("sheet") || SHEET_ID;
-  const out = [];
+  const out=[];
   if(CSV_URL) out.push({nom:"tableur publié (CSV)", url:CSV_URL});
   if(s) out.push({nom:"tableur partagé (gviz)",
     url:`https://docs.google.com/spreadsheets/d/${s}/gviz/tq?tqx=out:csv&gid=${SHEET_GID}`});
   return out;
 }
-
 function panneau(titre, corps){
-  document.getElementById("app").innerHTML =
-    `<div class="msg"><h3>${titre}</h3>${corps}</div>`;
+  document.getElementById("app").innerHTML = `<div class="msg"><h3>${titre}</h3>${corps}</div>`;
 }
-
+function setup(){
+  document.getElementById("sub").textContent = "Page pas encore reliée au tableur";
+  panneau("Il reste une étape",
+    `Cette page lit le planning directement dans le tableur, mais l'adresse du tableur n'est pas encore renseignée.
+     <ol><li>Ouvrir le tableur dans Google Sheets.</li>
+     <li><strong>Fichier → Partager → Publier sur le web</strong>.</li>
+     <li>Choisir l'onglet <strong>« Données web »</strong> et le format <strong>.csv</strong>, puis publier.</li>
+     <li>Coller l'adresse obtenue dans <code>CSV_URL</code>, tout en haut du script de cette page.</li></ol>`);
+}
 function diagnostic(essais){
   const local = location.protocol === "file:";
   const detail = essais.map(e=>`<li><strong>${esc(e.nom)}</strong> — ${esc(e.err)}</li>`).join("");
-  let corps = "";
-  if(local){
-    corps += `<p style="margin:0 0 .8rem">La page est ouverte <strong>directement depuis le disque</strong>
-      (adresse en <code>file://</code>). Dans ce mode, le navigateur interdit à la page d'aller
-      chercher des données sur internet — c'est une règle de sécurité, pas un défaut de la page.</p>
-      <p style="margin:0 0 .8rem">Pour la tester pour de vrai, deux possibilités :</p>
-      <ol>
-        <li>La mettre en ligne (GitHub Pages) et l'ouvrir depuis son adresse <code>https://…</code> ;</li>
-        <li>ou, depuis le dossier qui contient le fichier, lancer
-          <code>python3 -m http.server 8000</code> puis ouvrir
-          <code>http://localhost:8000/index.html</code>.</li>
-      </ol>`;
-  } else {
-    corps += `<p style="margin:0 0 .8rem">Le tableur n'a pas répondu. Les causes les plus fréquentes :
-      la publication sur le web n'est plus active, ou l'onglet publié n'est pas
-      <strong>« Données web »</strong>.</p>`;
-  }
+  let corps = local
+    ? `<p style="margin:0 0 .8rem">La page est ouverte <strong>directement depuis le disque</strong>
+        (adresse en <code>file://</code>). Dans ce mode, le navigateur interdit à la page d'aller
+        chercher des données sur internet — c'est une règle de sécurité, pas un défaut de la page.</p>
+       <p style="margin:0 0 .8rem">Pour la tester pour de vrai, deux possibilités :</p>
+       <ol><li>La mettre en ligne (GitHub Pages) et l'ouvrir depuis son adresse <code>https://…</code> ;</li>
+       <li>ou, depuis le dossier qui contient le fichier, lancer <code>python3 -m http.server 8000</code>
+       puis ouvrir <code>http://localhost:8000/index.html</code>.</li></ol>`
+    : `<p style="margin:0 0 .8rem">Le tableur n'a pas répondu. Les causes les plus fréquentes :
+        la publication sur le web n'est plus active, ou l'onglet publié n'est pas
+        <strong>« Données web »</strong>.</p>`;
   corps += `<p style="margin:.9rem 0 .3rem;color:var(--ink-3);font-size:.8rem">Ce qui a été tenté :</p>
     <ul style="margin:0;padding-left:1.2rem;color:var(--ink-3);font-size:.8rem">${detail}</ul>
     <p style="margin:.9rem 0 0"><button id="retry" type="button"
@@ -516,20 +643,19 @@ async function go(){
   const liste = sources();
   if(!liste.length){ setup(); return; }
   document.getElementById("sub").textContent = "Chargement du planning…";
-  const essais = [];
+  const essais=[];
   for(const src of liste){
     try{
       const r = await fetch(src.url, {cache:"no-store"});
-      if(!r.ok) throw new Error("réponse HTTP " + r.status);
+      if(!r.ok) throw new Error("réponse HTTP "+r.status);
       const days = toObjects(parseCSV(await r.text()));
       if(!days.length) throw new Error("aucune ligne exploitable dans la réponse");
       days.sort((a,b)=>a.date<b.date?-1:1);
       rendre(days);
       return;
     }catch(e){
-      const m = /fetch/i.test(e.message)
-        ? "pas de réponse (blocage réseau ou publication inactive)" : e.message;
-      essais.push({nom:src.nom, err:m});
+      essais.push({nom:src.nom, err:/fetch/i.test(e.message)
+        ? "pas de réponse (blocage réseau ou publication inactive)" : e.message});
     }
   }
   document.getElementById("sub").textContent = "Planning momentanément indisponible";
