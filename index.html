@@ -197,7 +197,7 @@ footer{margin-top:2.4rem;padding-top:1.2rem;border-top:1px solid var(--line);
    Google Sheets : Fichier → Partager → Publier sur le web
      · Onglet : « Données web »   · Format : .csv
    ================================================================== */
-const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSq70Ble2mZGcGvPZ8ecVqAaiYPQaF1ZIky_UbYt246_VBD-6bkQzUhB3jCkqbhKVvG7VMNAjOWH2gN/pub?gid=1504266455&single=true&output=csv";
+const CSV_URL = "";
 
 /* Secours : identifiant du tableur tel qu'il apparaît dans l'adresse d'édition
    https://docs.google.com/spreadsheets/d/CET_IDENTIFIANT/edit#gid=1504266455
@@ -216,8 +216,8 @@ const SHEET_GID = "1504266455";
    Ces trois lignes se fabriquent avec « outil-mot-de-passe.html », qui régénère un
    index.html complet — à garder sur votre ordinateur (ne pas le déposer sur GitHub).
    ------------------------------------------------------------------ */
-const COFFRE = "";
-const QUESTION = "";
+const COFFRE = "v2.300000.Pah7D1oCiQYgwYcPJRP6UQ==.8v3pwN4qyguGqaiX.imhLnou4q1pCOrOfdaAB/mixerpgg012WNK7XSYY0Hp1w8U4dAYkcDyYz/AnR7AWVFQ11XZ44UG1jYhcXuA5mz7sbuRrjrKSblAQdHHyqRE5X0zHtxuhocNsDQr/fVekRCws3Zngo84qfwR44GUVNPFs5OSJvNnBMHKcjgFG5bf3MBa3IJZ0RdrILNRYPpltdXq34L3Huvkp/9cByKe/SCibd2NhEmNg0DxxeKohH/TKlqanKZKWPCM=";
+const QUESTION = "Quelle est sa couleur préférée ?";
 
 /* ------------------------------------------------------------------ */
 const P = new URLSearchParams(location.search);
@@ -308,6 +308,10 @@ function libellePeriode(b){
   return `${cap(libelleDate(b.debut,true))} → ${libelleDate(b.fin,true)}${an}`;
 }
 function cap(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
+function dateHeure(d){
+  return d.toLocaleDateString("fr-FR") + " à " +
+         d.toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"});
+}
 /* Le tableur peut écrire l'horodatage en ISO ou au format français. On teste le format
    français d'abord : « 12/03/2027 » serait sinon lu comme le 3 décembre par le navigateur. */
 function litDate(v){
@@ -514,8 +518,9 @@ function renderList(){
 function majSub(n, trajets){
   const mot = trajets ? (n>1?"trajets":"trajet") : (n>1?"périodes":"période");
   const d = STATE.jours;
+  const maj = STATE.majSource ? ` · mis à jour le ${dateHeure(STATE.majSource)}` : "";
   document.getElementById("sub").textContent =
-    `${n} ${mot} · du ${libelleDate(d[0].date).replace(/^\S+ /,"")} ${dparts(d[0].date).y}` +
+    `${n} ${mot}${maj} · du ${libelleDate(d[0].date).replace(/^\S+ /,"")} ${dparts(d[0].date).y}` +
     ` au ${libelleDate(d[d.length-1].date).replace(/^\S+ /,"")} ${dparts(d[d.length-1].date).y}`;
 }
 
@@ -629,16 +634,10 @@ function rendre(days){
 
   document.getElementById("legend").innerHTML = Object.keys(CLASSE).map(k=>
     `<span class="${CLASSE[k]}" style="background:var(--cb);color:var(--c)">${esc(LIBELLE[k])}</span>`).join("");
-  const dt = d => d.toLocaleDateString("fr-FR") + " à " +
-                  d.toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"});
-  const maj = new Date();
   document.getElementById("foot").innerHTML =
     `« Trajets » liste chaque changement de lieu : aller depuis Corenc, retour vers Corenc,
      ou transit entre deux séjours — auquel cas les deux dates possibles sont indiquées.<br>
-     ${STATE.majSource
-        ? `Planning modifié pour la dernière fois le <strong>${dt(STATE.majSource)}</strong>.`
-        : "Planning tenu à jour par Marie et Raph."}
-     Page chargée le ${dt(maj)}.` +
+     Planning tenu à jour par Marie et Raph. Page chargée le ${dateHeure(new Date())}.` +
     (COFFRE ? ` <button class="oubli" id="oubli" type="button">Oublier la réponse sur cet appareil</button>.` : "");
   const ob = document.getElementById("oubli");
   if(ob) ob.addEventListener("click", oublier);
