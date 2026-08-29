@@ -135,6 +135,27 @@ h2{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink
 .m-def{--c:var(--def);--cb:var(--def-bg);font-style:italic}
 .m-def .note,.m-def .when{font-style:normal}
 .fleche{color:var(--ink-3);font-weight:400}
+.fin{display:flex;align-items:center;gap:.4rem;flex:0 0 auto;align-self:center}
+.cal{
+  width:1.95rem;height:1.95rem;border-radius:8px;padding:0;cursor:pointer;flex:0 0 auto;
+  background:transparent;border:1px solid var(--line);color:var(--ink-3);
+  display:flex;align-items:center;justify-content:center;
+}
+.cal svg{width:.92rem;height:.92rem;stroke:currentColor;fill:none;stroke-width:1.9;
+  stroke-linecap:round}
+.cal:hover,.cal:active{background:var(--line-2);color:var(--ink);border-color:var(--ink-3)}
+
+/* ---------------- export vers le calendrier ---------------- */
+.expbar{display:flex;margin:.2rem 0 .3rem}
+.expbar button[hidden]{display:none}
+.expbar button{
+  flex:1;font:inherit;font-size:.8rem;font-weight:600;padding:.52rem .8rem;border-radius:10px;
+  cursor:pointer;background:var(--card);border:1px solid var(--line);color:var(--ink-2);
+  display:flex;align-items:center;justify-content:center;gap:.45rem;
+}
+.expbar button:hover,.expbar button:active{background:var(--line-2);color:var(--ink)}
+.expbar svg{width:.95rem;height:.95rem;stroke:currentColor;fill:none;stroke-width:1.9;
+  stroke-linecap:round}
 
 /* ---------------- mois ---------------- */
 .month{margin:1.5rem 0 .5rem;font-size:.95rem;font-weight:650;letter-spacing:-.01em;
@@ -201,7 +222,7 @@ footer{margin-top:2.4rem;padding-top:1.2rem;border-top:1px solid var(--line);
    Google Sheets : Fichier → Partager → Publier sur le web
      · Onglet : « Données web »   · Format : .csv
    ================================================================== */
-const CSV_URL = "";
+const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSq70Ble2mZGcGvPZ8ecVqAaiYPQaF1ZIky_UbYt246_VBD-6bkQzUhB3jCkqbhKVvG7VMNAjOWH2gN/pub?gid=1504266455&single=true&output=csv";
 
 /* Secours : identifiant du tableur tel qu'il apparaît dans l'adresse d'édition
    https://docs.google.com/spreadsheets/d/CET_IDENTIFIANT/edit#gid=1504266455
@@ -220,8 +241,8 @@ const SHEET_GID = "1504266455";
    Ces trois lignes se fabriquent avec « outil-mot-de-passe.html », qui régénère un
    index.html complet — à garder sur votre ordinateur (ne pas le déposer sur GitHub).
    ------------------------------------------------------------------ */
-const COFFRE = "v2.300000.fZS15QP1a6b/LAMt9Q3P1Q==.d/ymCtY88I/Hx1kU.ZcWyRA+RUG3E1zKvk0xaUdfmUPf3Smv7I5L00qe/jnEmUREw66XHBR3s5DIdtb/ZreI8eo4Wu8CD7ItMQkOm5atDoHMvRBoQHu0TYRdYQQEnTWfLn2p36epue1GgLt69/nPFHLkIHJQPkPwnM14f2Mhdo5ld7uLMEdLkssjhXyyGlXUYSsUqdHM3X0GOJ1QoRxx4JgACV5/jZPMa8D/2//ZKf0eZL0g96qFXcbgaDijFmhDaCsx3Jto=";
-const QUESTION = "Quelle est sa couleur préférée ?";
+const COFFRE = "";
+const QUESTION = "";
 
 /* ------------------------------------------------------------------ */
 const P = new URLSearchParams(location.search);
@@ -387,20 +408,27 @@ function trajetsDepuis(complets){
     if(a.ou === b.ou) continue;                       // même lieu : pas de trajet
     if(a.ou === BASE && b.ou === BASE) continue;
     let sens, date, date2=null, quis, ous, note, couleur;
+    let brute, jours, passation=false;   // « brute » : la note sans échappement HTML, pour le .ics
     if(a.ou === BASE){
       sens="Aller";  date=b.debut; quis=[b.qui]; ous=[b.ou];
-      note = esc(LIBELLE[b.qui]||b.qui); couleur = classeQui(b.qui);
+      brute = LIBELLE[b.qui]||b.qui; couleur = classeQui(b.qui);
+      jours = [b.jours[0]];
     } else if(b.ou === BASE){
       sens="Retour"; date=a.fin;   quis=[a.qui]; ous=[a.ou];
-      note = esc(LIBELLE[a.qui]||a.qui); couleur = classeQui(a.qui);
+      brute = LIBELLE[a.qui]||a.qui; couleur = classeQui(a.qui);
+      jours = [a.jours[a.jours.length-1]];
     } else {
       sens="Transit"; date=a.fin; date2=b.debut; quis=[a.qui,b.qui]; ous=[a.ou,b.ou];
-      note = a.qui===b.qui ? esc(LIBELLE[a.qui]||a.qui)
-           : `Passation : ${esc(a.qui)} → ${esc(b.qui)}`;
+      brute = a.qui===b.qui ? (LIBELLE[a.qui]||a.qui)
+            : `Passation : ${a.qui} → ${b.qui}`;
       // passation entre deux personnes : on ne sait pas de qui est le trajet -> violet
       couleur = a.qui===b.qui ? classeQui(a.qui) : "m-tous";
+      jours = [a.jours[a.jours.length-1], b.jours[0]];
+      passation = a.qui !== b.qui;
     }
-    out.push({sens, date, date2, de:a.ou, vers:b.ou, quis, ous, note, couleur,
+    note = esc(brute);
+    out.push({sens, date, date2, de:a.ou, vers:b.ou, quis, ous, note, brute, jours, passation,
+      couleur,
       hay: norm([sens, a.ou, b.ou, a.qui, b.qui, LIBELLE[a.qui]||"", LIBELLE[b.qui]||"", note,
                  libelleDate(date), date2?libelleDate(date2):"",
                  MOIS[dparts(date).m]+" "+dparts(date).y,
@@ -422,7 +450,7 @@ const F_QUI_LAB = {"Raph":"Raph","Marie":"Marie","Tous les 3":"Tous les 3",
 const F_OU  = ["Paris","Corenc","Autres",NONDEF];
 
 const STATE = {today:"", periode:"we-vac", qui:new Set(), ou:new Set(),
-               complets:[], events:[], trajets:[], premierRendu:true};
+               complets:[], events:[], trajets:[], affiches:[], premierRendu:true};
 
 function sourceBlocs(){
   if(STATE.periode === "tout") return STATE.complets;
@@ -446,8 +474,173 @@ function elements(){
 }
 
 /* ==================================================================
+   3 bis. EXPORT VERS LE CALENDRIER (format iCalendar, RFC 5545)
+   ================================================================== */
+const ICONE_CAL = `<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18"
+  height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M12 13.5v5M9.5 16h5"/></svg>`;
+
+function icsTexte(s){
+  return String(s).replace(/\\/g,"\\\\").replace(/;/g,"\\;")
+                  .replace(/,/g,"\\,").replace(/\r?\n/g,"\\n");
+}
+/* RFC 5545 : 75 octets par ligne, les suivantes commencent par une espace. */
+function plier(ligne){
+  const enc = new TextEncoder();
+  let out = "", cur = "", limite = 75;
+  for(const ch of [...ligne]){
+    if(enc.encode(cur + ch).length > limite){
+      out += (out ? "\r\n" : "") + cur;
+      cur = " "; limite = 74;
+    }
+    cur += ch;
+  }
+  return out + (out ? "\r\n" : "") + cur;
+}
+function jourPlus(iso, n){
+  const d = new Date(iso + "T12:00:00Z");
+  d.setUTCDate(d.getUTCDate() + n);
+  return d.toISOString().slice(0,10);
+}
+const compact = iso => iso.replace(/-/g,"");
+const horodatage = new Date().toISOString().replace(/[-:]/g,"").replace(/\.\d+/,"");
+
+function evenement({debut, fin, titre, lieu, note, cle}){
+  const L = ["BEGIN:VEVENT",
+    "UID:" + cle.replace(/[^a-zA-Z0-9-]/g,"_") + "@ou-est-anna",
+    "DTSTAMP:" + horodatage,
+    "DTSTART;VALUE=DATE:" + compact(debut),
+    "DTEND;VALUE=DATE:" + compact(jourPlus(fin, 1)),
+    "SUMMARY:" + icsTexte(titre)];
+  if(lieu) L.push("LOCATION:" + icsTexte(lieu));
+  if(note) L.push("DESCRIPTION:" + icsTexte(note));
+  L.push("TRANSP:TRANSPARENT", "END:VEVENT");
+  return L;
+}
+
+function avecQui(q){
+  if(!q || q === NONDEF) return "";
+  return q === "Tous les 3" ? "Marie et Raph" : q;
+}
+/* Le lieu n'est pas dans le titre : il va dans le champ « Lieu » de l'évènement,
+   ce qui évite d'avoir à choisir entre « à Paris », « au Cap-Vert » et « dans le
+   Vercors » — le français n'a pas de règle là-dessus. */
+function titrePeriode(b){
+  const qui = avecQui(b.qui);
+  return qui ? `Anna avec ${qui}` : "Anna (avec qui à définir)";
+}
+/* Un lieu vide laisserait le champ muet, alors que c'est justement ce qu'il faut
+   remarquer : on l'écrit en toutes lettres. */
+function lieuEvenement(ou){
+  return (ou && ou !== NONDEF) ? ou : "Lieu à définir";
+}
+function titreTrajet(t){
+  const nom = o => o === NONDEF ? "lieu à définir" : o;
+  const a = avecQui(t.quis[0]), z = avecQui(t.quis[t.quis.length-1]);
+  // passation vers quelqu'un d'encore inconnu : le dire, plutôt que de laisser
+  // croire que la personne du départ fait tout le trajet.
+  const qui = a === z ? a : [a,z].map(x=> x || "à définir").join(" puis ");
+  return `Anna${qui ? " avec " + qui : ""} : ${nom(t.de)} → ${nom(t.vers)}`;
+}
+
+/* Les commentaires du tableur, jour par jour, en note de l'évènement. Deux jours
+   voisins portant le même commentaire sont réunis en une plage : sans cela, une
+   semaine de vacances produirait sept lignes identiques. */
+function notesDatees(jours){
+  const plages = []; let cur = null;
+  for(const d of jours){
+    const c = (d.com||"").trim().replace(/ – /g, " · ");
+    if(!c){ cur = null; continue; }
+    if(cur && cur.com === c && jourNum(d.date) === jourNum(cur.fin)+1){ cur.fin = d.date; continue; }
+    cur = {com:c, debut:d.date, fin:d.date};
+    plages.push(cur);
+  }
+  return plages.map(p => p.debut === p.fin
+    ? `${cap(libelleDate(p.debut))} : ${p.com}`
+    : `Du ${libelleDate(p.debut)} au ${libelleDate(p.fin)} : ${p.com}`);
+}
+
+function evenementBloc(b){
+  return evenement({
+    debut:b.debut, fin:b.fin,
+    lieu: lieuEvenement(b.ou),
+    titre: titrePeriode(b),
+    note: notesDatees(b.jours).join("\n"),
+    cle:`p-${b.debut}-${b.fin}-${b.qui}-${b.ou}`});
+}
+/* Sur un trajet, un commentaire n'a d'intérêt que s'il parle du jour du voyage.
+   « Vacances de la Toussaint », qui court sur deux semaines, ne dit rien du trajet ;
+   « Toussaint (férié) », qui ne vaut que ce jour-là, si. On ne garde donc que les
+   morceaux absents de la veille et du lendemain. */
+function morceaux(d){
+  return ((d && d.com) || "").replace(/ – /g, " · ").split(" · ")
+    .map(x=>x.trim()).filter(Boolean);
+}
+function joursTrajetFiltres(t){
+  const j = t.jours;
+  const bords = new Set([
+    ...morceaux(STATE.parDate[jourPlus(j[0].date, -1)]),
+    ...morceaux(STATE.parDate[jourPlus(j[j.length-1].date, 1)]),
+  ]);
+  return j.map(d=>({date:d.date, com: morceaux(d).filter(m=> !bords.has(m)).join(" · ")}));
+}
+/* Pour le .ics, où l'évènement peut couvrir deux jours : chaque ligne datée. */
+function notesTrajet(t){ return notesDatees(joursTrajetFiltres(t)); }
+/* Pour la vignette, où la date est déjà en tête : les morceaux, sans la répéter. */
+function comTrajet(t){
+  const vus = [];
+  for(const d of joursTrajetFiltres(t))
+    for(const m of morceaux(d)) if(!vus.includes(m)) vus.push(m);
+  return vus.join(" · ");
+}
+
+function evenementTrajet(t){
+  // le titre dit déjà avec qui : la note ne le répète que s'il y a passation
+  const lignes = [t.sens + (t.passation ? " · " + t.brute : "")];
+  if(t.date2) lignes.push(`Départ possible le ${libelleDate(t.date)} ou le ${libelleDate(t.date2)}.`);
+  lignes.push(...notesTrajet(t));
+  return evenement({
+    debut:t.date, fin:t.date2 || t.date,
+    lieu: "",                    // un trajet n'a pas de lieu : il en relie deux
+    titre: titreTrajet(t),
+    note: lignes.filter(Boolean).join("\n"),
+    cle:`t-${t.date}-${t.sens}-${t.de}-${t.vers}`});
+}
+
+function calendrier(elements, trajets){
+  const ev = elements.flatMap(e => trajets ? evenementTrajet(e) : evenementBloc(e));
+  const L = ["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Ou est Anna//FR","CALSCALE:GREGORIAN",
+             "METHOD:PUBLISH","X-WR-CALNAME:Où est Anna ?", ...ev, "END:VCALENDAR"];
+  return L.map(plier).join("\r\n") + "\r\n";
+}
+
+async function versCalendrier(elements, trajets, nom){
+  if(!elements.length) return;
+  const ics = calendrier(elements, trajets);
+  const blob = new Blob([ics], {type:"text/calendar;charset=utf-8"});
+  // Sur téléphone, la feuille de partage est la voie la plus directe vers le calendrier ;
+  // ailleurs, on retombe sur un téléchargement classique.
+  try{
+    const f = new File([blob], nom, {type:"text/calendar"});
+    if(navigator.canShare && navigator.canShare({files:[f]})){
+      await navigator.share({files:[f], title:"Où est Anna ?"});
+      return;
+    }
+  }catch(e){ if(e && e.name === "AbortError") return; }
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = nom;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url), 8000);
+}
+
+/* ==================================================================
    4. RENDU
    ================================================================== */
+function boutonCal(i, titre){
+  return `<button class="cal" type="button" data-i="${i}" title="${titre}"
+    aria-label="${titre}">${ICONE_CAL}</button>`;
+}
+
 function ligneBloc(b){
   const cl = classeQui(b.qui);
   const ici = b.debut<=STATE.today && STATE.today<=b.fin;
@@ -464,7 +657,8 @@ function ligneBloc(b){
       <p class="when">${esc(libellePeriode(b))}</p>
       <p class="who">${esc(LIBELLE[b.qui]||b.qui)}${lieu}</p>
       ${b.com?`<p class="note">${esc(b.com)}</p>`:""}
-    </div>${tag}
+    </div>
+    <div class="fin">${tag}${boutonCal(b._i, "Ajouter cette période au calendrier")}</div>
   </div>`;
 }
 
@@ -479,13 +673,17 @@ function ligneTrajet(t){
   const quand = t.date2
       ? `${cap(libelleDate(t.date,true))} <span class="fleche">ou</span> ${libelleDate(t.date2,true)}`
       : esc(cap(libelleDate(t.date)));
+  // seuls les commentaires propres au jour du trajet : voir joursTrajetFiltres
+  const com = comTrajet(t);
   return `<div class="row ${cl}${passe}${ici?" ici":""}"${ici?' id="ici"':""}>
     <div class="bar"></div>
     <div class="body">
       <p class="when">${quand}</p>
       <p class="who">${nom(t.de)} <span class="fleche">→</span> ${nom(t.vers)}</p>
-      <p class="note">${t.note}</p>
-    </div><span class="tag">${esc(t.sens)}</span>
+      <p class="note">${t.note}${com ? " · " + esc(com) : ""}</p>
+    </div>
+    <div class="fin"><span class="tag">${esc(t.sens)}</span>${
+      boutonCal(t._i, "Ajouter ce trajet au calendrier")}</div>
   </div>`;
 }
 
@@ -510,6 +708,9 @@ function renderList(){
   const l = elements();
   const res = document.getElementById("results");
   const trajets = STATE.periode === "trajets";
+  l.forEach((it,i)=> it._i = i);        // index stable, lu par les boutons « calendrier »
+  STATE.affiches = l;
+  majExport(l.length, trajets);
   if(!l.length){
     res.innerHTML = `<p class="empty">Rien ne correspond à cette combinaison de filtres.</p>`;
     majSub(0);
@@ -517,6 +718,17 @@ function renderList(){
   }
   res.innerHTML = parMois(l, trajets?(t=>t.date):(b=>b.debut), trajets?ligneTrajet:ligneBloc);
   majSub(l.length, trajets);
+}
+
+/* Le bouton global exporte exactement ce que les filtres laissent voir :
+   la sélection, c'est la liste affichée. */
+function majExport(n, trajets){
+  const b = document.getElementById("exp");
+  if(!b) return;
+  b.hidden = !n;
+  const mot = trajets ? (n>1?"trajets":"trajet") : (n>1?"périodes":"période");
+  const dem = n>1 ? "ces" : "ce" + (trajets ? "" : "tte");
+  b.innerHTML = ICONE_CAL + `<span>Ajouter ${dem} ${n>1?n+" ":""}${mot} au calendrier</span>`;
 }
 
 function majSub(n, trajets){
@@ -561,6 +773,19 @@ function initTools(){
   q.addEventListener("input", maj);
   q.addEventListener("keydown", e=>{ if(e.key==="Escape"){ q.value=""; maj(); } });
   clear.addEventListener("click", ()=>{ q.value=""; maj(); q.focus(); });
+
+  document.getElementById("results").addEventListener("click", e=>{
+    const btn = e.target.closest(".cal");
+    if(!btn) return;
+    const it = STATE.affiches[+btn.dataset.i];
+    if(!it) return;
+    const trajets = STATE.periode === "trajets";
+    versCalendrier([it], trajets, `anna-${trajets?it.date:it.debut}.ics`);
+  });
+  document.getElementById("exp").addEventListener("click", ()=>{
+    const trajets = STATE.periode === "trajets";
+    versCalendrier(STATE.affiches, trajets, trajets?"anna-trajets.ics":"anna-planning.ics");
+  });
 
   for(const btn of document.querySelectorAll(".frow button")){
     btn.addEventListener("click", ()=>{
@@ -617,11 +842,14 @@ function carteNow(){
 function rendre(days){
   STATE.today = aujourdhui();
   STATE.jours = days;
+  STATE.parDate = Object.fromEntries(days.map(d=>[d.date, d]));
   STATE.complets = grouper(days, d=> d.qui+"|"+d.ou+"|"+(d.typ==="vacances"?"V":"S"));
   STATE.events   = grouper(days, d=> d.qui+"|"+d.ou, notable);
   STATE.trajets  = trajetsDepuis(STATE.complets);
 
-  document.getElementById("app").innerHTML = carteNow() + barreHTML() + `<div id="results"></div>`;
+  document.getElementById("app").innerHTML = carteNow() + barreHTML() +
+    `<p class="expbar"><button id="exp" type="button" hidden></button></p>` +
+    `<div id="results"></div>`;
   initTools();
   renderList();
 
