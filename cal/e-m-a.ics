@@ -1,0 +1,52 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Ou est Anna 4.0//FR
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:Anna — périodes (Marie\, Autres)
+X-PUBLISHED-TTL:PT6H
+BEGIN:VEVENT
+UID:p-2026-10-17-2026-10-23-Marie-Presqu__le_de_Gien@ou-est-anna
+DTSTAMP:20260830T092900Z
+DTSTART;VALUE=DATE:20261017
+DTEND;VALUE=DATE:20261024
+SUMMARY:Anna avec Marie
+LOCATION:Presqu'île de Gien
+DESCRIPTION:Du samedi 17 octobre au vendredi 23 octobre : Vacances de la To
+ ussaint
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+UID:p-2027-01-09-2027-01-24-Marie-Cap-Vert@ou-est-anna
+DTSTAMP:20260830T092900Z
+DTSTART;VALUE=DATE:20270109
+DTEND;VALUE=DATE:20270125
+SUMMARY:Anna avec Marie
+LOCATION:Cap-Vert
+DESCRIPTION:Du samedi 9 janvier au dimanche 24 janvier : Avec Palu & Mamisa
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+UID:p-2027-07-03-2027-07-10-Marie-Vercors@ou-est-anna
+DTSTAMP:20260830T092900Z
+DTSTART;VALUE=DATE:20270703
+DTEND;VALUE=DATE:20270711
+SUMMARY:Anna avec Marie
+LOCATION:Vercors
+DESCRIPTION:Du samedi 3 juillet au samedi 10 juillet : Vacances d'été · 
+ GTV avec un âne
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+UID:p-2027-07-11-2027-07-18-Marie-Ferme_des_Amanins@ou-est-anna
+DTSTAMP:20260830T092900Z
+DTSTART;VALUE=DATE:20270711
+DTEND;VALUE=DATE:20270719
+SUMMARY:Anna avec Marie
+LOCATION:Ferme des Amanins
+DESCRIPTION:Du dimanche 11 juillet au mardi 13 juillet : Vacances d'été\n
+ Mercredi 14 juillet : Vacances d'été · Fête Nationale (férié)\nDu j
+ eudi 15 juillet au dimanche 18 juillet : Vacances d'été
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

@@ -1,0 +1,1061 @@
+{
+ "version": "4.0",
+ "dossier": "cal",
+ "calendriers": [
+  {
+   "fichier": "e-0-0.ics",
+   "nom": "Anna — périodes",
+   "n": 31
+  },
+  {
+   "fichier": "e-0-p.ics",
+   "nom": "Anna — périodes (Paris)",
+   "n": 5
+  },
+  {
+   "fichier": "e-0-c.ics",
+   "nom": "Anna — périodes (Corenc)",
+   "n": 22
+  },
+  {
+   "fichier": "e-0-pc.ics",
+   "nom": "Anna — périodes (Paris, Corenc)",
+   "n": 27
+  },
+  {
+   "fichier": "e-0-a.ics",
+   "nom": "Anna — périodes (Autres)",
+   "n": 4
+  },
+  {
+   "fichier": "e-0-pa.ics",
+   "nom": "Anna — périodes (Paris, Autres)",
+   "n": 9
+  },
+  {
+   "fichier": "e-0-ca.ics",
+   "nom": "Anna — périodes (Corenc, Autres)",
+   "n": 26
+  },
+  {
+   "fichier": "e-r-0.ics",
+   "nom": "Anna — périodes (Raph)",
+   "n": 11
+  },
+  {
+   "fichier": "e-r-p.ics",
+   "nom": "Anna — périodes (Raph, Paris)",
+   "n": 5
+  },
+  {
+   "fichier": "e-r-c.ics",
+   "nom": "Anna — périodes (Raph, Corenc)",
+   "n": 6
+  },
+  {
+   "fichier": "e-r-pc.ics",
+   "nom": "Anna — périodes (Raph, Paris, Corenc)",
+   "n": 11
+  },
+  {
+   "fichier": "e-r-a.ics",
+   "nom": "Anna — périodes (Raph, Autres)",
+   "n": 0
+  },
+  {
+   "fichier": "e-r-pa.ics",
+   "nom": "Anna — périodes (Raph, Paris, Autres)",
+   "n": 5
+  },
+  {
+   "fichier": "e-r-ca.ics",
+   "nom": "Anna — périodes (Raph, Corenc, Autres)",
+   "n": 6
+  },
+  {
+   "fichier": "e-m-0.ics",
+   "nom": "Anna — périodes (Marie)",
+   "n": 17
+  },
+  {
+   "fichier": "e-m-p.ics",
+   "nom": "Anna — périodes (Marie, Paris)",
+   "n": 0
+  },
+  {
+   "fichier": "e-m-c.ics",
+   "nom": "Anna — périodes (Marie, Corenc)",
+   "n": 13
+  },
+  {
+   "fichier": "e-m-pc.ics",
+   "nom": "Anna — périodes (Marie, Paris, Corenc)",
+   "n": 13
+  },
+  {
+   "fichier": "e-m-a.ics",
+   "nom": "Anna — périodes (Marie, Autres)",
+   "n": 4
+  },
+  {
+   "fichier": "e-m-pa.ics",
+   "nom": "Anna — périodes (Marie, Paris, Autres)",
+   "n": 4
+  },
+  {
+   "fichier": "e-m-ca.ics",
+   "nom": "Anna — périodes (Marie, Corenc, Autres)",
+   "n": 17
+  },
+  {
+   "fichier": "e-rm-0.ics",
+   "nom": "Anna — périodes (Raph, Marie)",
+   "n": 28
+  },
+  {
+   "fichier": "e-rm-p.ics",
+   "nom": "Anna — périodes (Raph, Marie, Paris)",
+   "n": 5
+  },
+  {
+   "fichier": "e-rm-c.ics",
+   "nom": "Anna — périodes (Raph, Marie, Corenc)",
+   "n": 19
+  },
+  {
+   "fichier": "e-rm-pc.ics",
+   "nom": "Anna — périodes (Raph, Marie, Paris, Corenc)",
+   "n": 24
+  },
+  {
+   "fichier": "e-rm-a.ics",
+   "nom": "Anna — périodes (Raph, Marie, Autres)",
+   "n": 4
+  },
+  {
+   "fichier": "e-rm-pa.ics",
+   "nom": "Anna — périodes (Raph, Marie, Paris, Autres)",
+   "n": 9
+  },
+  {
+   "fichier": "e-rm-ca.ics",
+   "nom": "Anna — périodes (Raph, Marie, Corenc, Autres)",
+   "n": 23
+  },
+  {
+   "fichier": "e-3-0.ics",
+   "nom": "Anna — périodes (Tous les 3)",
+   "n": 0
+  },
+  {
+   "fichier": "e-3-p.ics",
+   "nom": "Anna — périodes (Tous les 3, Paris)",
+   "n": 0
+  },
+  {
+   "fichier": "e-3-c.ics",
+   "nom": "Anna — périodes (Tous les 3, Corenc)",
+   "n": 0
+  },
+  {
+   "fichier": "e-3-pc.ics",
+   "nom": "Anna — périodes (Tous les 3, Paris, Corenc)",
+   "n": 0
+  },
+  {
+   "fichier": "e-3-a.ics",
+   "nom": "Anna — périodes (Tous les 3, Autres)",
+   "n": 0
+  },
+  {
+   "fichier": "e-3-pa.ics",
+   "nom": "Anna — périodes (Tous les 3, Paris, Autres)",
+   "n": 0
+  },
+  {
+   "fichier": "e-3-ca.ics",
+   "nom": "Anna — périodes (Tous les 3, Corenc, Autres)",
+   "n": 0
+  },
+  {
+   "fichier": "e-a-0.ics",
+   "nom": "Anna — périodes (Autres)",
+   "n": 3
+  },
+  {
+   "fichier": "e-a-p.ics",
+   "nom": "Anna — périodes (Autres, Paris)",
+   "n": 0
+  },
+  {
+   "fichier": "e-a-c.ics",
+   "nom": "Anna — périodes (Autres, Corenc)",
+   "n": 3
+  },
+  {
+   "fichier": "e-a-pc.ics",
+   "nom": "Anna — périodes (Autres, Paris, Corenc)",
+   "n": 3
+  },
+  {
+   "fichier": "e-a-a.ics",
+   "nom": "Anna — périodes (Autres, Autres)",
+   "n": 0
+  },
+  {
+   "fichier": "e-a-pa.ics",
+   "nom": "Anna — périodes (Autres, Paris, Autres)",
+   "n": 0
+  },
+  {
+   "fichier": "e-a-ca.ics",
+   "nom": "Anna — périodes (Autres, Corenc, Autres)",
+   "n": 3
+  },
+  {
+   "fichier": "e-ra-0.ics",
+   "nom": "Anna — périodes (Raph, Autres)",
+   "n": 14
+  },
+  {
+   "fichier": "e-ra-p.ics",
+   "nom": "Anna — périodes (Raph, Autres, Paris)",
+   "n": 5
+  },
+  {
+   "fichier": "e-ra-c.ics",
+   "nom": "Anna — périodes (Raph, Autres, Corenc)",
+   "n": 9
+  },
+  {
+   "fichier": "e-ra-pc.ics",
+   "nom": "Anna — périodes (Raph, Autres, Paris, Corenc)",
+   "n": 14
+  },
+  {
+   "fichier": "e-ra-a.ics",
+   "nom": "Anna — périodes (Raph, Autres, Autres)",
+   "n": 0
+  },
+  {
+   "fichier": "e-ra-pa.ics",
+   "nom": "Anna — périodes (Raph, Autres, Paris, Autres)",
+   "n": 5
+  },
+  {
+   "fichier": "e-ra-ca.ics",
+   "nom": "Anna — périodes (Raph, Autres, Corenc, Autres)",
+   "n": 9
+  },
+  {
+   "fichier": "e-ma-0.ics",
+   "nom": "Anna — périodes (Marie, Autres)",
+   "n": 20
+  },
+  {
+   "fichier": "e-ma-p.ics",
+   "nom": "Anna — périodes (Marie, Autres, Paris)",
+   "n": 0
+  },
+  {
+   "fichier": "e-ma-c.ics",
+   "nom": "Anna — périodes (Marie, Autres, Corenc)",
+   "n": 16
+  },
+  {
+   "fichier": "e-ma-pc.ics",
+   "nom": "Anna — périodes (Marie, Autres, Paris, Corenc)",
+   "n": 16
+  },
+  {
+   "fichier": "e-ma-a.ics",
+   "nom": "Anna — périodes (Marie, Autres, Autres)",
+   "n": 4
+  },
+  {
+   "fichier": "e-ma-pa.ics",
+   "nom": "Anna — périodes (Marie, Autres, Paris, Autres)",
+   "n": 4
+  },
+  {
+   "fichier": "e-ma-ca.ics",
+   "nom": "Anna — périodes (Marie, Autres, Corenc, Autres)",
+   "n": 20
+  },
+  {
+   "fichier": "e-rma-0.ics",
+   "nom": "Anna — périodes (Raph, Marie, Autres)",
+   "n": 31
+  },
+  {
+   "fichier": "e-rma-p.ics",
+   "nom": "Anna — périodes (Raph, Marie, Autres, Paris)",
+   "n": 5
+  },
+  {
+   "fichier": "e-rma-c.ics",
+   "nom": "Anna — périodes (Raph, Marie, Autres, Corenc)",
+   "n": 22
+  },
+  {
+   "fichier": "e-rma-pc.ics",
+   "nom": "Anna — périodes (Raph, Marie, Autres, Paris, Corenc)",
+   "n": 27
+  },
+  {
+   "fichier": "e-rma-a.ics",
+   "nom": "Anna — périodes (Raph, Marie, Autres, Autres)",
+   "n": 4
+  },
+  {
+   "fichier": "e-rma-pa.ics",
+   "nom": "Anna — périodes (Raph, Marie, Autres, Paris, Autres)",
+   "n": 9
+  },
+  {
+   "fichier": "e-rma-ca.ics",
+   "nom": "Anna — périodes (Raph, Marie, Autres, Corenc, Autres)",
+   "n": 26
+  },
+  {
+   "fichier": "e-3a-0.ics",
+   "nom": "Anna — périodes (Tous les 3, Autres)",
+   "n": 3
+  },
+  {
+   "fichier": "e-3a-p.ics",
+   "nom": "Anna — périodes (Tous les 3, Autres, Paris)",
+   "n": 0
+  },
+  {
+   "fichier": "e-3a-c.ics",
+   "nom": "Anna — périodes (Tous les 3, Autres, Corenc)",
+   "n": 3
+  },
+  {
+   "fichier": "e-3a-pc.ics",
+   "nom": "Anna — périodes (Tous les 3, Autres, Paris, Corenc)",
+   "n": 3
+  },
+  {
+   "fichier": "e-3a-a.ics",
+   "nom": "Anna — périodes (Tous les 3, Autres, Autres)",
+   "n": 0
+  },
+  {
+   "fichier": "e-3a-pa.ics",
+   "nom": "Anna — périodes (Tous les 3, Autres, Paris, Autres)",
+   "n": 0
+  },
+  {
+   "fichier": "e-3a-ca.ics",
+   "nom": "Anna — périodes (Tous les 3, Autres, Corenc, Autres)",
+   "n": 3
+  },
+  {
+   "fichier": "t-0-0.ics",
+   "nom": "Anna — tout le planning",
+   "n": 41
+  },
+  {
+   "fichier": "t-0-p.ics",
+   "nom": "Anna — tout le planning (Paris)",
+   "n": 5
+  },
+  {
+   "fichier": "t-0-c.ics",
+   "nom": "Anna — tout le planning (Corenc)",
+   "n": 32
+  },
+  {
+   "fichier": "t-0-pc.ics",
+   "nom": "Anna — tout le planning (Paris, Corenc)",
+   "n": 37
+  },
+  {
+   "fichier": "t-0-a.ics",
+   "nom": "Anna — tout le planning (Autres)",
+   "n": 4
+  },
+  {
+   "fichier": "t-0-pa.ics",
+   "nom": "Anna — tout le planning (Paris, Autres)",
+   "n": 9
+  },
+  {
+   "fichier": "t-0-ca.ics",
+   "nom": "Anna — tout le planning (Corenc, Autres)",
+   "n": 36
+  },
+  {
+   "fichier": "t-r-0.ics",
+   "nom": "Anna — tout le planning (Raph)",
+   "n": 12
+  },
+  {
+   "fichier": "t-r-p.ics",
+   "nom": "Anna — tout le planning (Raph, Paris)",
+   "n": 5
+  },
+  {
+   "fichier": "t-r-c.ics",
+   "nom": "Anna — tout le planning (Raph, Corenc)",
+   "n": 7
+  },
+  {
+   "fichier": "t-r-pc.ics",
+   "nom": "Anna — tout le planning (Raph, Paris, Corenc)",
+   "n": 12
+  },
+  {
+   "fichier": "t-r-a.ics",
+   "nom": "Anna — tout le planning (Raph, Autres)",
+   "n": 0
+  },
+  {
+   "fichier": "t-r-pa.ics",
+   "nom": "Anna — tout le planning (Raph, Paris, Autres)",
+   "n": 5
+  },
+  {
+   "fichier": "t-r-ca.ics",
+   "nom": "Anna — tout le planning (Raph, Corenc, Autres)",
+   "n": 7
+  },
+  {
+   "fichier": "t-m-0.ics",
+   "nom": "Anna — tout le planning (Marie)",
+   "n": 27
+  },
+  {
+   "fichier": "t-m-p.ics",
+   "nom": "Anna — tout le planning (Marie, Paris)",
+   "n": 0
+  },
+  {
+   "fichier": "t-m-c.ics",
+   "nom": "Anna — tout le planning (Marie, Corenc)",
+   "n": 23
+  },
+  {
+   "fichier": "t-m-pc.ics",
+   "nom": "Anna — tout le planning (Marie, Paris, Corenc)",
+   "n": 23
+  },
+  {
+   "fichier": "t-m-a.ics",
+   "nom": "Anna — tout le planning (Marie, Autres)",
+   "n": 4
+  },
+  {
+   "fichier": "t-m-pa.ics",
+   "nom": "Anna — tout le planning (Marie, Paris, Autres)",
+   "n": 4
+  },
+  {
+   "fichier": "t-m-ca.ics",
+   "nom": "Anna — tout le planning (Marie, Corenc, Autres)",
+   "n": 27
+  },
+  {
+   "fichier": "t-rm-0.ics",
+   "nom": "Anna — tout le planning (Raph, Marie)",
+   "n": 38
+  },
+  {
+   "fichier": "t-rm-p.ics",
+   "nom": "Anna — tout le planning (Raph, Marie, Paris)",
+   "n": 5
+  },
+  {
+   "fichier": "t-rm-c.ics",
+   "nom": "Anna — tout le planning (Raph, Marie, Corenc)",
+   "n": 29
+  },
+  {
+   "fichier": "t-rm-pc.ics",
+   "nom": "Anna — tout le planning (Raph, Marie, Paris, Corenc)",
+   "n": 34
+  },
+  {
+   "fichier": "t-rm-a.ics",
+   "nom": "Anna — tout le planning (Raph, Marie, Autres)",
+   "n": 4
+  },
+  {
+   "fichier": "t-rm-pa.ics",
+   "nom": "Anna — tout le planning (Raph, Marie, Paris, Autres)",
+   "n": 9
+  },
+  {
+   "fichier": "t-rm-ca.ics",
+   "nom": "Anna — tout le planning (Raph, Marie, Corenc, Autres)",
+   "n": 33
+  },
+  {
+   "fichier": "t-3-0.ics",
+   "nom": "Anna — tout le planning (Tous les 3)",
+   "n": 1
+  },
+  {
+   "fichier": "t-3-p.ics",
+   "nom": "Anna — tout le planning (Tous les 3, Paris)",
+   "n": 0
+  },
+  {
+   "fichier": "t-3-c.ics",
+   "nom": "Anna — tout le planning (Tous les 3, Corenc)",
+   "n": 1
+  },
+  {
+   "fichier": "t-3-pc.ics",
+   "nom": "Anna — tout le planning (Tous les 3, Paris, Corenc)",
+   "n": 1
+  },
+  {
+   "fichier": "t-3-a.ics",
+   "nom": "Anna — tout le planning (Tous les 3, Autres)",
+   "n": 0
+  },
+  {
+   "fichier": "t-3-pa.ics",
+   "nom": "Anna — tout le planning (Tous les 3, Paris, Autres)",
+   "n": 0
+  },
+  {
+   "fichier": "t-3-ca.ics",
+   "nom": "Anna — tout le planning (Tous les 3, Corenc, Autres)",
+   "n": 1
+  },
+  {
+   "fichier": "t-a-0.ics",
+   "nom": "Anna — tout le planning (Autres)",
+   "n": 3
+  },
+  {
+   "fichier": "t-a-p.ics",
+   "nom": "Anna — tout le planning (Autres, Paris)",
+   "n": 0
+  },
+  {
+   "fichier": "t-a-c.ics",
+   "nom": "Anna — tout le planning (Autres, Corenc)",
+   "n": 3
+  },
+  {
+   "fichier": "t-a-pc.ics",
+   "nom": "Anna — tout le planning (Autres, Paris, Corenc)",
+   "n": 3
+  },
+  {
+   "fichier": "t-a-a.ics",
+   "nom": "Anna — tout le planning (Autres, Autres)",
+   "n": 0
+  },
+  {
+   "fichier": "t-a-pa.ics",
+   "nom": "Anna — tout le planning (Autres, Paris, Autres)",
+   "n": 0
+  },
+  {
+   "fichier": "t-a-ca.ics",
+   "nom": "Anna — tout le planning (Autres, Corenc, Autres)",
+   "n": 3
+  },
+  {
+   "fichier": "t-ra-0.ics",
+   "nom": "Anna — tout le planning (Raph, Autres)",
+   "n": 15
+  },
+  {
+   "fichier": "t-ra-p.ics",
+   "nom": "Anna — tout le planning (Raph, Autres, Paris)",
+   "n": 5
+  },
+  {
+   "fichier": "t-ra-c.ics",
+   "nom": "Anna — tout le planning (Raph, Autres, Corenc)",
+   "n": 10
+  },
+  {
+   "fichier": "t-ra-pc.ics",
+   "nom": "Anna — tout le planning (Raph, Autres, Paris, Corenc)",
+   "n": 15
+  },
+  {
+   "fichier": "t-ra-a.ics",
+   "nom": "Anna — tout le planning (Raph, Autres, Autres)",
+   "n": 0
+  },
+  {
+   "fichier": "t-ra-pa.ics",
+   "nom": "Anna — tout le planning (Raph, Autres, Paris, Autres)",
+   "n": 5
+  },
+  {
+   "fichier": "t-ra-ca.ics",
+   "nom": "Anna — tout le planning (Raph, Autres, Corenc, Autres)",
+   "n": 10
+  },
+  {
+   "fichier": "t-ma-0.ics",
+   "nom": "Anna — tout le planning (Marie, Autres)",
+   "n": 30
+  },
+  {
+   "fichier": "t-ma-p.ics",
+   "nom": "Anna — tout le planning (Marie, Autres, Paris)",
+   "n": 0
+  },
+  {
+   "fichier": "t-ma-c.ics",
+   "nom": "Anna — tout le planning (Marie, Autres, Corenc)",
+   "n": 26
+  },
+  {
+   "fichier": "t-ma-pc.ics",
+   "nom": "Anna — tout le planning (Marie, Autres, Paris, Corenc)",
+   "n": 26
+  },
+  {
+   "fichier": "t-ma-a.ics",
+   "nom": "Anna — tout le planning (Marie, Autres, Autres)",
+   "n": 4
+  },
+  {
+   "fichier": "t-ma-pa.ics",
+   "nom": "Anna — tout le planning (Marie, Autres, Paris, Autres)",
+   "n": 4
+  },
+  {
+   "fichier": "t-ma-ca.ics",
+   "nom": "Anna — tout le planning (Marie, Autres, Corenc, Autres)",
+   "n": 30
+  },
+  {
+   "fichier": "t-rma-0.ics",
+   "nom": "Anna — tout le planning (Raph, Marie, Autres)",
+   "n": 41
+  },
+  {
+   "fichier": "t-rma-p.ics",
+   "nom": "Anna — tout le planning (Raph, Marie, Autres, Paris)",
+   "n": 5
+  },
+  {
+   "fichier": "t-rma-c.ics",
+   "nom": "Anna — tout le planning (Raph, Marie, Autres, Corenc)",
+   "n": 32
+  },
+  {
+   "fichier": "t-rma-pc.ics",
+   "nom": "Anna — tout le planning (Raph, Marie, Autres, Paris, Corenc)",
+   "n": 37
+  },
+  {
+   "fichier": "t-rma-a.ics",
+   "nom": "Anna — tout le planning (Raph, Marie, Autres, Autres)",
+   "n": 4
+  },
+  {
+   "fichier": "t-rma-pa.ics",
+   "nom": "Anna — tout le planning (Raph, Marie, Autres, Paris, Autres)",
+   "n": 9
+  },
+  {
+   "fichier": "t-rma-ca.ics",
+   "nom": "Anna — tout le planning (Raph, Marie, Autres, Corenc, Autres)",
+   "n": 36
+  },
+  {
+   "fichier": "t-3a-0.ics",
+   "nom": "Anna — tout le planning (Tous les 3, Autres)",
+   "n": 4
+  },
+  {
+   "fichier": "t-3a-p.ics",
+   "nom": "Anna — tout le planning (Tous les 3, Autres, Paris)",
+   "n": 0
+  },
+  {
+   "fichier": "t-3a-c.ics",
+   "nom": "Anna — tout le planning (Tous les 3, Autres, Corenc)",
+   "n": 4
+  },
+  {
+   "fichier": "t-3a-pc.ics",
+   "nom": "Anna — tout le planning (Tous les 3, Autres, Paris, Corenc)",
+   "n": 4
+  },
+  {
+   "fichier": "t-3a-a.ics",
+   "nom": "Anna — tout le planning (Tous les 3, Autres, Autres)",
+   "n": 0
+  },
+  {
+   "fichier": "t-3a-pa.ics",
+   "nom": "Anna — tout le planning (Tous les 3, Autres, Paris, Autres)",
+   "n": 0
+  },
+  {
+   "fichier": "t-3a-ca.ics",
+   "nom": "Anna — tout le planning (Tous les 3, Autres, Corenc, Autres)",
+   "n": 4
+  },
+  {
+   "fichier": "j-0-0.ics",
+   "nom": "Anna — trajets",
+   "n": 15
+  },
+  {
+   "fichier": "j-0-p.ics",
+   "nom": "Anna — trajets (Paris)",
+   "n": 10
+  },
+  {
+   "fichier": "j-0-c.ics",
+   "nom": "Anna — trajets (Corenc)",
+   "n": 0
+  },
+  {
+   "fichier": "j-0-pc.ics",
+   "nom": "Anna — trajets (Paris, Corenc)",
+   "n": 10
+  },
+  {
+   "fichier": "j-0-a.ics",
+   "nom": "Anna — trajets (Autres)",
+   "n": 5
+  },
+  {
+   "fichier": "j-0-pa.ics",
+   "nom": "Anna — trajets (Paris, Autres)",
+   "n": 15
+  },
+  {
+   "fichier": "j-0-ca.ics",
+   "nom": "Anna — trajets (Corenc, Autres)",
+   "n": 5
+  },
+  {
+   "fichier": "j-r-0.ics",
+   "nom": "Anna — trajets (Raph)",
+   "n": 10
+  },
+  {
+   "fichier": "j-r-p.ics",
+   "nom": "Anna — trajets (Raph, Paris)",
+   "n": 10
+  },
+  {
+   "fichier": "j-r-c.ics",
+   "nom": "Anna — trajets (Raph, Corenc)",
+   "n": 0
+  },
+  {
+   "fichier": "j-r-pc.ics",
+   "nom": "Anna — trajets (Raph, Paris, Corenc)",
+   "n": 10
+  },
+  {
+   "fichier": "j-r-a.ics",
+   "nom": "Anna — trajets (Raph, Autres)",
+   "n": 0
+  },
+  {
+   "fichier": "j-r-pa.ics",
+   "nom": "Anna — trajets (Raph, Paris, Autres)",
+   "n": 10
+  },
+  {
+   "fichier": "j-r-ca.ics",
+   "nom": "Anna — trajets (Raph, Corenc, Autres)",
+   "n": 0
+  },
+  {
+   "fichier": "j-m-0.ics",
+   "nom": "Anna — trajets (Marie)",
+   "n": 5
+  },
+  {
+   "fichier": "j-m-p.ics",
+   "nom": "Anna — trajets (Marie, Paris)",
+   "n": 0
+  },
+  {
+   "fichier": "j-m-c.ics",
+   "nom": "Anna — trajets (Marie, Corenc)",
+   "n": 0
+  },
+  {
+   "fichier": "j-m-pc.ics",
+   "nom": "Anna — trajets (Marie, Paris, Corenc)",
+   "n": 0
+  },
+  {
+   "fichier": "j-m-a.ics",
+   "nom": "Anna — trajets (Marie, Autres)",
+   "n": 5
+  },
+  {
+   "fichier": "j-m-pa.ics",
+   "nom": "Anna — trajets (Marie, Paris, Autres)",
+   "n": 5
+  },
+  {
+   "fichier": "j-m-ca.ics",
+   "nom": "Anna — trajets (Marie, Corenc, Autres)",
+   "n": 5
+  },
+  {
+   "fichier": "j-rm-0.ics",
+   "nom": "Anna — trajets (Raph, Marie)",
+   "n": 15
+  },
+  {
+   "fichier": "j-rm-p.ics",
+   "nom": "Anna — trajets (Raph, Marie, Paris)",
+   "n": 10
+  },
+  {
+   "fichier": "j-rm-c.ics",
+   "nom": "Anna — trajets (Raph, Marie, Corenc)",
+   "n": 0
+  },
+  {
+   "fichier": "j-rm-pc.ics",
+   "nom": "Anna — trajets (Raph, Marie, Paris, Corenc)",
+   "n": 10
+  },
+  {
+   "fichier": "j-rm-a.ics",
+   "nom": "Anna — trajets (Raph, Marie, Autres)",
+   "n": 5
+  },
+  {
+   "fichier": "j-rm-pa.ics",
+   "nom": "Anna — trajets (Raph, Marie, Paris, Autres)",
+   "n": 15
+  },
+  {
+   "fichier": "j-rm-ca.ics",
+   "nom": "Anna — trajets (Raph, Marie, Corenc, Autres)",
+   "n": 5
+  },
+  {
+   "fichier": "j-3-0.ics",
+   "nom": "Anna — trajets (Tous les 3)",
+   "n": 0
+  },
+  {
+   "fichier": "j-3-p.ics",
+   "nom": "Anna — trajets (Tous les 3, Paris)",
+   "n": 0
+  },
+  {
+   "fichier": "j-3-c.ics",
+   "nom": "Anna — trajets (Tous les 3, Corenc)",
+   "n": 0
+  },
+  {
+   "fichier": "j-3-pc.ics",
+   "nom": "Anna — trajets (Tous les 3, Paris, Corenc)",
+   "n": 0
+  },
+  {
+   "fichier": "j-3-a.ics",
+   "nom": "Anna — trajets (Tous les 3, Autres)",
+   "n": 0
+  },
+  {
+   "fichier": "j-3-pa.ics",
+   "nom": "Anna — trajets (Tous les 3, Paris, Autres)",
+   "n": 0
+  },
+  {
+   "fichier": "j-3-ca.ics",
+   "nom": "Anna — trajets (Tous les 3, Corenc, Autres)",
+   "n": 0
+  },
+  {
+   "fichier": "j-a-0.ics",
+   "nom": "Anna — trajets (Autres)",
+   "n": 0
+  },
+  {
+   "fichier": "j-a-p.ics",
+   "nom": "Anna — trajets (Autres, Paris)",
+   "n": 0
+  },
+  {
+   "fichier": "j-a-c.ics",
+   "nom": "Anna — trajets (Autres, Corenc)",
+   "n": 0
+  },
+  {
+   "fichier": "j-a-pc.ics",
+   "nom": "Anna — trajets (Autres, Paris, Corenc)",
+   "n": 0
+  },
+  {
+   "fichier": "j-a-a.ics",
+   "nom": "Anna — trajets (Autres, Autres)",
+   "n": 0
+  },
+  {
+   "fichier": "j-a-pa.ics",
+   "nom": "Anna — trajets (Autres, Paris, Autres)",
+   "n": 0
+  },
+  {
+   "fichier": "j-a-ca.ics",
+   "nom": "Anna — trajets (Autres, Corenc, Autres)",
+   "n": 0
+  },
+  {
+   "fichier": "j-ra-0.ics",
+   "nom": "Anna — trajets (Raph, Autres)",
+   "n": 10
+  },
+  {
+   "fichier": "j-ra-p.ics",
+   "nom": "Anna — trajets (Raph, Autres, Paris)",
+   "n": 10
+  },
+  {
+   "fichier": "j-ra-c.ics",
+   "nom": "Anna — trajets (Raph, Autres, Corenc)",
+   "n": 0
+  },
+  {
+   "fichier": "j-ra-pc.ics",
+   "nom": "Anna — trajets (Raph, Autres, Paris, Corenc)",
+   "n": 10
+  },
+  {
+   "fichier": "j-ra-a.ics",
+   "nom": "Anna — trajets (Raph, Autres, Autres)",
+   "n": 0
+  },
+  {
+   "fichier": "j-ra-pa.ics",
+   "nom": "Anna — trajets (Raph, Autres, Paris, Autres)",
+   "n": 10
+  },
+  {
+   "fichier": "j-ra-ca.ics",
+   "nom": "Anna — trajets (Raph, Autres, Corenc, Autres)",
+   "n": 0
+  },
+  {
+   "fichier": "j-ma-0.ics",
+   "nom": "Anna — trajets (Marie, Autres)",
+   "n": 5
+  },
+  {
+   "fichier": "j-ma-p.ics",
+   "nom": "Anna — trajets (Marie, Autres, Paris)",
+   "n": 0
+  },
+  {
+   "fichier": "j-ma-c.ics",
+   "nom": "Anna — trajets (Marie, Autres, Corenc)",
+   "n": 0
+  },
+  {
+   "fichier": "j-ma-pc.ics",
+   "nom": "Anna — trajets (Marie, Autres, Paris, Corenc)",
+   "n": 0
+  },
+  {
+   "fichier": "j-ma-a.ics",
+   "nom": "Anna — trajets (Marie, Autres, Autres)",
+   "n": 5
+  },
+  {
+   "fichier": "j-ma-pa.ics",
+   "nom": "Anna — trajets (Marie, Autres, Paris, Autres)",
+   "n": 5
+  },
+  {
+   "fichier": "j-ma-ca.ics",
+   "nom": "Anna — trajets (Marie, Autres, Corenc, Autres)",
+   "n": 5
+  },
+  {
+   "fichier": "j-rma-0.ics",
+   "nom": "Anna — trajets (Raph, Marie, Autres)",
+   "n": 15
+  },
+  {
+   "fichier": "j-rma-p.ics",
+   "nom": "Anna — trajets (Raph, Marie, Autres, Paris)",
+   "n": 10
+  },
+  {
+   "fichier": "j-rma-c.ics",
+   "nom": "Anna — trajets (Raph, Marie, Autres, Corenc)",
+   "n": 0
+  },
+  {
+   "fichier": "j-rma-pc.ics",
+   "nom": "Anna — trajets (Raph, Marie, Autres, Paris, Corenc)",
+   "n": 10
+  },
+  {
+   "fichier": "j-rma-a.ics",
+   "nom": "Anna — trajets (Raph, Marie, Autres, Autres)",
+   "n": 5
+  },
+  {
+   "fichier": "j-rma-pa.ics",
+   "nom": "Anna — trajets (Raph, Marie, Autres, Paris, Autres)",
+   "n": 15
+  },
+  {
+   "fichier": "j-rma-ca.ics",
+   "nom": "Anna — trajets (Raph, Marie, Autres, Corenc, Autres)",
+   "n": 5
+  },
+  {
+   "fichier": "j-3a-0.ics",
+   "nom": "Anna — trajets (Tous les 3, Autres)",
+   "n": 0
+  },
+  {
+   "fichier": "j-3a-p.ics",
+   "nom": "Anna — trajets (Tous les 3, Autres, Paris)",
+   "n": 0
+  },
+  {
+   "fichier": "j-3a-c.ics",
+   "nom": "Anna — trajets (Tous les 3, Autres, Corenc)",
+   "n": 0
+  },
+  {
+   "fichier": "j-3a-pc.ics",
+   "nom": "Anna — trajets (Tous les 3, Autres, Paris, Corenc)",
+   "n": 0
+  },
+  {
+   "fichier": "j-3a-a.ics",
+   "nom": "Anna — trajets (Tous les 3, Autres, Autres)",
+   "n": 0
+  },
+  {
+   "fichier": "j-3a-pa.ics",
+   "nom": "Anna — trajets (Tous les 3, Autres, Paris, Autres)",
+   "n": 0
+  },
+  {
+   "fichier": "j-3a-ca.ics",
+   "nom": "Anna — trajets (Tous les 3, Autres, Corenc, Autres)",
+   "n": 0
+  },
+  {
+   "fichier": "vide.ics",
+   "nom": "Anna — périodes (À définir)",
+   "n": 0
+  }
+ ]
+}
