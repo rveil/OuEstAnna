@@ -135,19 +135,34 @@ h2{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink
 .m-def{--c:var(--def);--cb:var(--def-bg);font-style:italic}
 .m-def .note,.m-def .when{font-style:normal}
 .fleche{color:var(--ink-3);font-weight:400}
-.fin{display:flex;align-items:center;gap:.4rem;flex:0 0 auto;align-self:center}
-.cal{
-  width:1.95rem;height:1.95rem;border-radius:8px;padding:0;cursor:pointer;flex:0 0 auto;
-  background:transparent;border:1px solid var(--line);color:var(--ink-3);
-  display:flex;align-items:center;justify-content:center;
-}
-.cal svg{width:.92rem;height:.92rem;stroke:currentColor;fill:none;stroke-width:1.9;
-  stroke-linecap:round}
-.cal:hover,.cal:active{background:var(--line-2);color:var(--ink);border-color:var(--ink-3)}
 
-/* ---------------- export vers le calendrier ---------------- */
-.expbar{display:flex;margin:.2rem 0 .3rem}
-.expbar button[hidden]{display:none}
+/* ---------------- abonnement au calendrier ---------------- */
+.expbar{display:flex;flex-direction:column;gap:.32rem;margin:.2rem 0 .3rem}
+.expbar button[hidden],.expbar p[hidden]{display:none}
+.expbar p{margin:0;font-size:.72rem;line-height:1.4;color:var(--ink-3);text-align:center}
+/* ---------------- fenêtre d'abonnement ---------------- */
+.voile{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.45);
+  display:flex;align-items:center;justify-content:center;padding:1rem;overflow:auto}
+.abo{background:var(--card);border:1px solid var(--line);border-radius:16px;
+  padding:1.15rem;width:min(30rem,100%);max-height:90vh;overflow:auto}
+.abo h3{margin:0 0 .7rem;font-size:.95rem}
+.abo p{margin:0 0 .6rem;font-size:.8rem;line-height:1.5;color:var(--ink-2)}
+.abo .quoi{background:var(--line-2);border-radius:10px;padding:.6rem .7rem;color:var(--ink)}
+.abo .avert{color:var(--ink-3);font-size:.75rem}
+.abo .alerte{background:var(--raph-bg);color:var(--raph);border-radius:10px;
+  padding:.55rem .7rem;font-size:.78rem;font-weight:500}
+.abo .alerte[hidden]{display:none}
+.abo .actions{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.9rem}
+.abo .actions button{font:inherit;font-size:.8rem;font-weight:600;padding:.55rem .8rem;
+  border-radius:10px;cursor:pointer;border:1px solid var(--line);background:transparent;
+  color:var(--ink-2)}
+.abo .actions .fort{background:var(--ink);color:var(--bg);border-color:var(--ink);flex:1}
+.abo .actions button:hover{border-color:var(--ink-3)}
+.abo .deja{font-size:.75rem;color:var(--ink-3);border-top:1px solid var(--line);
+  margin-top:.9rem;padding-top:.7rem}
+.abo .deja b{display:block;color:var(--ink-2);font-weight:600;margin-bottom:.25rem}
+.abo code{font-size:.7rem;word-break:break-all;background:var(--line-2);
+  padding:.1rem .25rem;border-radius:4px}
 .expbar button{
   flex:1;font:inherit;font-size:.8rem;font-weight:600;padding:.52rem .8rem;border-radius:10px;
   cursor:pointer;background:var(--card);border:1px solid var(--line);color:var(--ink-2);
@@ -156,6 +171,20 @@ h2{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink
 .expbar button:hover,.expbar button:active{background:var(--line-2);color:var(--ink)}
 .expbar svg{width:.95rem;height:.95rem;stroke:currentColor;fill:none;stroke-width:1.9;
   stroke-linecap:round}
+
+/* ---------------- bandeau « et maintenant ? » ---------------- */
+.toast{
+  position:fixed;bottom:.75rem;left:50%;transform:translateX(-50%);z-index:50;
+  width:min(34rem,calc(100% - 1.5rem));background:var(--ink);color:var(--bg);
+  border-radius:12px;padding:.7rem .5rem .7rem .85rem;font-size:.8rem;line-height:1.45;
+  box-shadow:0 8px 28px rgba(0,0,0,.28);display:flex;gap:.5rem;align-items:flex-start;
+}
+.toast p{margin:0;flex:1}
+.toast button{
+  flex:0 0 auto;font:inherit;font-size:1.1rem;line-height:1;padding:.1rem .4rem;
+  background:none;border:0;color:inherit;opacity:.6;cursor:pointer;
+}
+.toast button:hover{opacity:1}
 
 /* ---------------- mois ---------------- */
 .month{margin:1.5rem 0 .5rem;font-size:.95rem;font-weight:650;letter-spacing:-.01em;
@@ -222,13 +251,28 @@ footer{margin-top:2.4rem;padding-top:1.2rem;border-top:1px solid var(--line);
    Google Sheets : Fichier → Partager → Publier sur le web
      · Onglet : « Données web »   · Format : .csv
    ================================================================== */
-const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSq70Ble2mZGcGvPZ8ecVqAaiYPQaF1ZIky_UbYt246_VBD-6bkQzUhB3jCkqbhKVvG7VMNAjOWH2gN/pub?gid=1504266455&single=true&output=csv";
+const CSV_URL = "";
 
 /* Secours : identifiant du tableur tel qu'il apparaît dans l'adresse d'édition
    https://docs.google.com/spreadsheets/d/CET_IDENTIFIANT/edit#gid=1504266455
    Le tableur doit alors être partagé en « Tout utilisateur disposant du lien — Lecteur ». */
 const SHEET_ID = "";
 const SHEET_GID = "1504266455";
+
+/* ------------------------------------------------------------------
+   ABONNEMENT AU CALENDRIER (facultatif)
+   Adresse de l'application web Apps Script qui sert le planning au format
+   iCalendar — celle qui se termine par /exec. Tant qu'elle est vide, la page
+   ne propose pas l'abonnement, et tout le reste fonctionne normalement.
+   Voir le README pour le déploiement.
+   ------------------------------------------------------------------ */
+const SCRIPT_URL = "";
+/* Pour essayer une autre adresse sans toucher au fichier : …/index.html?script=… */
+/* Quand la page est protégée, l'adresse du script est chiffrée avec celle du
+   tableur : elle n'apparaît qu'après le mot de passe, et le lien d'abonnement
+   n'ouvre donc pas de porte à côté de celle qu'on ferme. */
+let SCRIPT_DECHIFFRE = "";
+function adresseScript(){ return P.get("script") || SCRIPT_DECHIFFRE || SCRIPT_URL; }
 
 /* ------------------------------------------------------------------
    MOT DE PASSE (facultatif)
@@ -241,11 +285,27 @@ const SHEET_GID = "1504266455";
    Ces trois lignes se fabriquent avec « outil-mot-de-passe.html », qui régénère un
    index.html complet — à garder sur votre ordinateur (ne pas le déposer sur GitHub).
    ------------------------------------------------------------------ */
-const COFFRE = "";
-const QUESTION = "";
+const COFFRE = "v2.300000.TV0duvBdXVHzac0w6JZ2OQ==.vMCZ1thafsCPQCHa.g7i8wuiSSqoFcz/EA7yoa4g4tRoAG83OhpVce7tjEGseIbSO445QCQyfjIo5RbIZCRkjDEOwU9wLu+ojv4Cm8Jptf4FkoMPU6k2RIVAM2TkBpwUNMyJLjBeclGFWmkKk3y3VtWwQEwyuXFrCx98AzbY5cX2fsKNjaKfEL+OQBg2O0bR1poBeB2yM/EMS0y/Tni/pBSOOAcj4mwd/QjxYohATLl70SqNiXvyyOmfN9I+g3AoINOP+tGHgBQUxysjYFW+bE80JcJVPpGLwj/IN8D1rZfVmUf58St2H7U6EiZn4YeUGZTfwe3Tfq7hlqMjH182PiBG8gY+U6WNUoQo6Am+fTlDf4pQKfhPtwVx1pkrhRb+Lwrpo292aR8BreiqPxkYpl/7siYWdyA==";
+const QUESTION = "Quelle est sa couleur préférée ?";
 
 /* ------------------------------------------------------------------ */
 const P = new URLSearchParams(location.search);
+
+/* >>> LOGIQUE PARTAGÉE — engendré, ne pas modifier ici <<< */
+/* ==================================================================
+   LOGIQUE PARTAGÉE — version 3.1
+   ------------------------------------------------------------------
+   Ce bloc est IDENTIQUE, au caractère près, dans index.html et dans
+   Code.gs. Il est engendré par build_logique.py à partir de
+   logique.js : ne rien modifier dans les fichiers engendrés, mais
+   dans logique.js, puis régénérer les deux ensemble.
+
+   C'est ce qui empêche la page et le calendrier de raconter deux
+   histoires différentes. Le numéro de version est servi par le script
+   (?v=1) et vérifié par la page au moment de l'abonnement : si les
+   deux ne correspondent pas, la page le dit.
+   ================================================================== */
+const VERSION = "3.1";
 
 const JOURS = {lun:"lundi",mar:"mardi",mer:"mercredi",jeu:"jeudi",ven:"vendredi",sam:"samedi",dim:"dimanche"};
 const MOIS = ["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
@@ -333,10 +393,7 @@ function libellePeriode(b){
   return `${cap(libelleDate(b.debut,true))} → ${libelleDate(b.fin,true)}${an}`;
 }
 function cap(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
-function dateHeure(d){
-  return d.toLocaleDateString("fr-FR") + " à " +
-         d.toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"});
-}
+
 /* Le tableur peut écrire l'horodatage en ISO ou au format français. On teste le format
    français d'abord : « 12/03/2027 » serait sinon lu comme le 3 décembre par le navigateur. */
 function litDate(v){
@@ -345,10 +402,6 @@ function litDate(v){
     /^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:[ ,]+(\d{1,2}):(\d{2})(?::(\d{2}))?)?$/);
   if(m) return new Date(+m[3], +m[2]-1, +m[1], +(m[4]||0), +(m[5]||0), +(m[6]||0));
   return isNaN(Date.parse(v)) ? null : new Date(v);
-}
-function aujourdhui(){
-  const n=new Date();
-  return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,"0")}-${String(n.getDate()).padStart(2,"0")}`;
 }
 
 /* ==================================================================
@@ -437,48 +490,8 @@ function trajetsDepuis(complets){
   return out.sort((x,y)=> x.date<y.date?-1:1);
 }
 /* ==================================================================
-   3. FILTRES
+   FABRICATION DU FICHIER iCalendar (RFC 5545)
    ================================================================== */
-const PERIODES = [
-  {id:"tout",    lab:"Tout"},
-  {id:"we-vac",  lab:"Week-ends & Vacances"},
-  {id:"trajets", lab:"Trajets"},
-];
-const F_QUI = ["Raph","Marie","Tous les 3","Autres",NONDEF];
-const F_QUI_LAB = {"Raph":"Raph","Marie":"Marie","Tous les 3":"Tous les 3",
-                   "Autres":"Autres",[NONDEF]:NONDEF};
-const F_OU  = ["Paris","Corenc","Autres",NONDEF];
-
-const STATE = {today:"", periode:"we-vac", qui:new Set(), ou:new Set(),
-               complets:[], events:[], trajets:[], affiches:[], premierRendu:true};
-
-function sourceBlocs(){
-  if(STATE.periode === "tout") return STATE.complets;
-  // Périodes de vacances entières, et week-ends et jours fériés hors vacances.
-  return STATE.events.filter(b=> b.types.has("vacances")
-        || b.types.has("week-end") || b.types.has("férié"));
-}
-function passeQuiOu(quis, ous){
-  if(STATE.qui.size && !quis.some(q=>STATE.qui.has(categorieQui(q)))) return false;
-  if(STATE.ou.size && !ous.some(o=>STATE.ou.has(categorieLieu(o)))) return false;
-  return true;
-}
-function requete(){ const e=document.getElementById("q"); return e ? norm(e.value.trim()) : ""; }
-
-function elements(){
-  const q = requete();
-  if(STATE.periode === "trajets"){
-    return STATE.trajets.filter(t=> passeQuiOu(t.quis,t.ous) && (!q || t.hay.includes(q)));
-  }
-  return sourceBlocs().filter(b=> passeQuiOu([b.qui],[b.ou]) && (!q || b.hay.includes(q)));
-}
-
-/* ==================================================================
-   3 bis. EXPORT VERS LE CALENDRIER (format iCalendar, RFC 5545)
-   ================================================================== */
-const ICONE_CAL = `<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18"
-  height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M12 13.5v5M9.5 16h5"/></svg>`;
-
 function icsTexte(s){
   return String(s).replace(/\\/g,"\\\\").replace(/;/g,"\\;")
                   .replace(/,/g,"\\,").replace(/\r?\n/g,"\\n");
@@ -502,12 +515,13 @@ function jourPlus(iso, n){
   return d.toISOString().slice(0,10);
 }
 const compact = iso => iso.replace(/-/g,"");
-const horodatage = new Date().toISOString().replace(/[-:]/g,"").replace(/\.\d+/,"");
+/* Calculé à l'appel : côté script, le fichier est refabriqué à chaque requête. */
+function horodatage(){ return new Date().toISOString().replace(/[-:]/g,"").replace(/\.\d+/,""); }
 
 function evenement({debut, fin, titre, lieu, note, cle}){
   const L = ["BEGIN:VEVENT",
     "UID:" + cle.replace(/[^a-zA-Z0-9-]/g,"_") + "@ou-est-anna",
-    "DTSTAMP:" + horodatage,
+    "DTSTAMP:" + horodatage(),
     "DTSTART;VALUE=DATE:" + compact(debut),
     "DTEND;VALUE=DATE:" + compact(jourPlus(fin, 1)),
     "SUMMARY:" + icsTexte(titre)];
@@ -524,6 +538,15 @@ function avecQui(q){
 /* Le lieu n'est pas dans le titre : il va dans le champ « Lieu » de l'évènement,
    ce qui évite d'avoir à choisir entre « à Paris », « au Cap-Vert » et « dans le
    Vercors » — le français n'a pas de règle là-dessus. */
+/* On n'ajoute au calendrier que ce qui est arrêté. Un évènement « à définir »
+   n'apprend rien à personne, et il faudrait aller le corriger à la main dans le
+   calendrier une fois la case remplie — c'est pire que de ne rien ajouter. */
+function defini(v){ return !!v && v !== NONDEF; }
+function exportable(x, trajets){
+  return trajets ? (defini(x.de) && defini(x.vers) && x.quis.every(defini))
+                 : (defini(x.qui) && defini(x.ou));
+}
+
 function titrePeriode(b){
   const qui = avecQui(b.qui);
   return qui ? `Anna avec ${qui}` : "Anna (avec qui à définir)";
@@ -575,29 +598,29 @@ function morceaux(d){
   return ((d && d.com) || "").replace(/ – /g, " · ").split(" · ")
     .map(x=>x.trim()).filter(Boolean);
 }
-function joursTrajetFiltres(t){
+function joursTrajetFiltres(t, parDate){
   const j = t.jours;
   const bords = new Set([
-    ...morceaux(STATE.parDate[jourPlus(j[0].date, -1)]),
-    ...morceaux(STATE.parDate[jourPlus(j[j.length-1].date, 1)]),
+    ...morceaux(parDate[jourPlus(j[0].date, -1)]),
+    ...morceaux(parDate[jourPlus(j[j.length-1].date, 1)]),
   ]);
   return j.map(d=>({date:d.date, com: morceaux(d).filter(m=> !bords.has(m)).join(" · ")}));
 }
 /* Pour le .ics, où l'évènement peut couvrir deux jours : chaque ligne datée. */
-function notesTrajet(t){ return notesDatees(joursTrajetFiltres(t)); }
+function notesTrajet(t, parDate){ return notesDatees(joursTrajetFiltres(t, parDate)); }
 /* Pour la vignette, où la date est déjà en tête : les morceaux, sans la répéter. */
-function comTrajet(t){
+function comTrajet(t, parDate){
   const vus = [];
-  for(const d of joursTrajetFiltres(t))
+  for(const d of joursTrajetFiltres(t, parDate))
     for(const m of morceaux(d)) if(!vus.includes(m)) vus.push(m);
   return vus.join(" · ");
 }
 
-function evenementTrajet(t){
+function evenementTrajet(t, parDate){
   // le titre dit déjà avec qui : la note ne le répète que s'il y a passation
   const lignes = [t.sens + (t.passation ? " · " + t.brute : "")];
   if(t.date2) lignes.push(`Départ possible le ${libelleDate(t.date)} ou le ${libelleDate(t.date2)}.`);
-  lignes.push(...notesTrajet(t));
+  lignes.push(...notesTrajet(t, parDate));
   return evenement({
     debut:t.date, fin:t.date2 || t.date,
     lieu: "",                    // un trajet n'a pas de lieu : il en relie deux
@@ -606,41 +629,254 @@ function evenementTrajet(t){
     cle:`t-${t.date}-${t.sens}-${t.de}-${t.vers}`});
 }
 
-function calendrier(elements, trajets){
-  const ev = elements.flatMap(e => trajets ? evenementTrajet(e) : evenementBloc(e));
-  const L = ["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Ou est Anna//FR","CALSCALE:GREGORIAN",
-             "METHOD:PUBLISH","X-WR-CALNAME:Où est Anna ?", ...ev, "END:VCALENDAR"];
+function calendrier(elements, trajets, parDate, nomCal){
+  const ev = elements.flatMap(e => trajets ? evenementTrajet(e, parDate) : evenementBloc(e));
+  const L = ["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Ou est Anna " + VERSION + "//FR",
+             "CALSCALE:GREGORIAN","METHOD:PUBLISH",
+             "X-WR-CALNAME:" + icsTexte(nomCal || "Où est Anna ?"),
+             "X-PUBLISHED-TTL:PT6H", ...ev, "END:VCALENDAR"];
   return L.map(plier).join("\r\n") + "\r\n";
 }
 
-async function versCalendrier(elements, trajets, nom){
-  if(!elements.length) return;
-  const ics = calendrier(elements, trajets);
-  const blob = new Blob([ics], {type:"text/calendar;charset=utf-8"});
-  // Sur téléphone, la feuille de partage est la voie la plus directe vers le calendrier ;
-  // ailleurs, on retombe sur un téléchargement classique.
+/* ------------------------------------------------------------------
+   Point d'entrée commun : la page et le script passent tous deux par
+   ici, et c'est ce qui garantit qu'ils voient le même planning.
+   ------------------------------------------------------------------ */
+function modele(days){
+  const complets = grouper(days, function(d){ return d.qui+"|"+d.ou+"|"+(d.typ==="vacances"?"V":"S"); });
+  const events   = grouper(days, function(d){ return d.qui+"|"+d.ou; }, notable);
+  const parDate  = {};
+  for(const d of days) parDate[d.date] = d;
+  return {complets:complets, events:events, trajets:trajetsDepuis(complets), parDate:parDate};
+}
+/* Les trois vues de la barre « Périodes ». */
+function vueDe(m, vue){
+  if(vue === "trajets") return m.trajets;
+  if(vue === "tout")    return m.complets;
+  // Périodes de vacances entières, et week-ends et jours fériés hors vacances.
+  return m.events.filter(function(b){ return b.types.has("vacances")
+        || b.types.has("week-end") || b.types.has("férié"); });
+}
+/* « Tous les 3 », c'est aussi Raph et c'est aussi Marie. Qui coche l'un ou
+   l'autre veut voir les moments où ils sont tous là : on élargit donc le filtre
+   plutôt que de laisser ces périodes disparaître. L'inverse n'est pas vrai —
+   cocher « Tous les 3 » ne fait pas apparaître les week-ends de l'un seul. */
+function elargirQui(fQui){
+  if(!fQui || !fQui.length) return fQui;
+  const s = fQui.slice();
+  if((s.indexOf("Raph") >= 0 || s.indexOf("Marie") >= 0) && s.indexOf("Tous les 3") < 0)
+    s.push("Tous les 3");
+  return s;
+}
+/* fQui et fOu : listes de catégories retenues ; vides = tout passe. */
+function passeQuiOu(quis, ous, fQui, fOu){
+  const q = elargirQui(fQui);
+  if(q && q.length && !quis.some(x=> q.indexOf(categorieQui(x)) >= 0)) return false;
+  if(fOu && fOu.length && !ous.some(o=> fOu.indexOf(categorieLieu(o)) >= 0)) return false;
+  return true;
+}
+function filtrer(liste, trajets, fQui, fOu){
+  return liste.filter(x=> passeQuiOu(trajets ? x.quis : [x.qui],
+                                     trajets ? x.ous  : [x.ou], fQui, fOu));
+}
+/* Le nom du calendrier porte ses filtres : un abonnement oublié reste
+   identifiable d'un coup d'œil dans la liste des calendriers. */
+function nomCalendrier(vue, fQui, fOu){
+  const quoi = vue === "trajets" ? "trajets"
+             : vue === "tout"    ? "tout le planning"
+             :                     "périodes";
+  const f = [].concat(fQui || [], fOu || []);
+  return "Anna — " + quoi + (f.length ? " (" + f.join(", ") + ")" : "");
+}
+
+/* Ce qui part au calendrier : la vue, moins ce qui reste à définir. */
+function pourCalendrier(m, vue, fQui, fOu){
+  const trajets = vue === "trajets";
+  return filtrer(vueDe(m, vue), trajets, fQui, fOu).filter(x=> exportable(x, trajets));
+}
+/* >>> FIN LOGIQUE PARTAGÉE <<< */
+function dateHeure(d){
+  return d.toLocaleDateString("fr-FR") + " à " +
+         d.toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"});
+}
+function aujourdhui(){
+  const n=new Date();
+  return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,"0")}-${String(n.getDate()).padStart(2,"0")}`;
+}
+
+/* ==================================================================
+   3. FILTRES ET VUES
+   ================================================================== */
+const PERIODES = [
+  {id:"tout",    lab:"Tout"},
+  {id:"we-vac",  lab:"Week-ends & Vacances"},
+  {id:"trajets", lab:"Trajets"},
+];
+const F_QUI = ["Raph","Marie","Tous les 3","Autres",NONDEF];
+const F_QUI_LAB = {"Raph":"Raph","Marie":"Marie","Tous les 3":"Tous les 3",
+                   "Autres":"Autres",[NONDEF]:NONDEF};
+const F_OU  = ["Paris","Corenc","Autres",NONDEF];
+
+const STATE = {today:"", periode:"we-vac", qui:new Set(), ou:new Set(),
+               modele:null, premierRendu:true};
+
+/* La barre « Périodes » nomme la vue par défaut « we-vac » ; le script, lui,
+   l'appelle « evenements ». Une seule fonction pour traduire. */
+function vueCourante(){ return STATE.periode === "we-vac" ? "evenements" : STATE.periode; }
+function requete(){ const e=document.getElementById("q"); return e ? norm(e.value.trim()) : ""; }
+
+/* Vue et filtres passent par le bloc partagé — le même que le script utilise
+   pour fabriquer les abonnements. Seule la recherche reste ici : elle n'a de
+   sens que dans la page, pas dans un calendrier. */
+function elements(){
+  const q = requete();
+  const l = filtrer(vueDe(STATE.modele, STATE.periode),
+                    STATE.periode === "trajets", [...STATE.qui], [...STATE.ou]);
+  return q ? l.filter(x=> x.hay.includes(q)) : l;
+}
+
+/* ==================================================================
+   3 bis. EXPORT VERS LE CALENDRIER (format iCalendar, RFC 5545)
+   ================================================================== */
+const ICONE_CAL = `<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18"
+  height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M12 13.5v5M9.5 16h5"/></svg>`;
+
+
+let minuteurToast;
+function bandeau(texte){
+  document.querySelector(".toast")?.remove();
+  clearTimeout(minuteurToast);
+  const d = document.createElement("div");
+  d.className = "toast";
+  d.setAttribute("role", "status");
+  d.innerHTML = `<p></p><button type="button" aria-label="Fermer">×</button>`;
+  d.querySelector("p").textContent = texte.replace(/\s+/g, " ").trim();
+  d.querySelector("button").addEventListener("click", ()=>d.remove());
+  document.body.appendChild(d);
+  minuteurToast = setTimeout(()=>d.remove(), 15000);
+}
+
+/* ==================================================================
+   3 ter. ABONNEMENT — un calendrier qui se met à jour tout seul
+   ------------------------------------------------------------------
+   Un export est une photo ; un abonnement est un fil. Le lien pointe sur
+   l'application web du tableur, avec les filtres courants inscrits dedans.
+   Il ne bouge plus ensuite : c'est ce qui évite les doublons, puisqu'il
+   n'y a jamais de raison de se réabonner — mais changer de filtres
+   suppose donc de supprimer le calendrier et d'en ajouter un autre.
+   ================================================================== */
+const MEMO_ABO = "anna-abos";
+
+function adresseAbo(){
+  const base = adresseScript();
+  const par = new URLSearchParams({c: vueCourante()});
+  if(STATE.qui.size) par.set("qui", [...STATE.qui].join(","));
+  if(STATE.ou.size)  par.set("ou",  [...STATE.ou].join(","));
+  return base + (base.includes("?") ? "&" : "?") + par.toString();
+}
+/* webcal:// est ce qui déclenche « s'abonner » plutôt que « télécharger ». */
+const enWebcal = u => u.replace(/^https?:\/\//, "webcal://");
+
+function memoAbos(){
+  try{ return JSON.parse(localStorage.getItem(MEMO_ABO) || "[]"); }catch(e){ return []; }
+}
+function noterAbo(nom, url){
+  const l = memoAbos().filter(x=> x.url !== url);
+  l.unshift({nom, url, le: new Date().toISOString()});
+  try{ localStorage.setItem(MEMO_ABO, JSON.stringify(l.slice(0,6))); }catch(e){}
+}
+
+/* Ce que l'abonné verra, en toutes lettres. Le but est qu'il ne découvre pas
+   après coup que son calendrier ne montre qu'une partie du planning. */
+function resumeAbo(){
+  const vue = vueCourante();
+  const quoi = vue === "trajets" ? "les trajets"
+             : vue === "tout"    ? "tout le planning, semaines d'école comprises"
+             :                     "les week-ends et les vacances";
+  const f = [];
+  if(STATE.qui.size) f.push("avec " + [...STATE.qui].join(" ou "));
+  if(STATE.ou.size)  f.push("à " + [...STATE.ou].join(" ou "));
+  return quoi + (f.length ? ", " + f.join(", ") : "") + ".";
+}
+
+async function versionDuScript(){
   try{
-    const f = new File([blob], nom, {type:"text/calendar"});
-    if(navigator.canShare && navigator.canShare({files:[f]})){
-      await navigator.share({files:[f], title:"Où est Anna ?"});
-      return;
-    }
-  }catch(e){ if(e && e.name === "AbortError") return; }
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url; a.download = nom;
-  document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(()=>URL.revokeObjectURL(url), 8000);
+    const u = adresseScript();
+    const r = await fetch(u + (u.includes("?") ? "&" : "?") + "v=1",
+                          {redirect:"follow"});
+    return (await r.text()).trim();
+  }catch(e){ return null; }
+}
+
+function fermerAbo(){ document.querySelector(".voile")?.remove(); }
+
+async function ouvrirAbo(){
+  const vue = vueCourante(), fQui = [...STATE.qui], fOu = [...STATE.ou];
+  const url = adresseAbo(), nom = nomCalendrier(vue, fQui, fOu);
+  // Le compte annoncé doit être celui de l'abonnement, pas celui de l'écran :
+  // la recherche filtre la liste affichée mais n'entre pas dans le lien.
+  const n = pourCalendrier(STATE.modele, vue, fQui, fOu).length;
+  const q = requete();
+  const deja = memoAbos();
+
+  const v = document.createElement("div");
+  v.className = "voile";
+  v.innerHTML = `<div class="abo" role="dialog" aria-modal="true" aria-label="S'abonner">
+    <h3>S'abonner à cette vue</h3>
+    <p class="quoi"><b>${esc(nom)}</b><br>Ce calendrier montrera ${esc(resumeAbo())}
+      Soit ${n} ${n>1?"évènements":"évènement"} pour l'instant, et il suivra le tableur tout seul.</p>
+    ${q ? `<p class="avert">Votre recherche « ${esc(q)} » n'est pas reprise : un abonnement
+      ne retient que les filtres.</p>` : ""}
+    <p class="avert">Les filtres sont inscrits dans le lien une fois pour toutes. Pour en changer
+      plus tard, supprimez ce calendrier de votre téléphone puis abonnez-vous à nouveau — sans quoi
+      vous verrez les deux en même temps.</p>
+    <p class="alerte" id="abo-v" hidden></p>
+    <div class="actions">
+      <button type="button" class="fort" id="abo-go">S'abonner</button>
+      <button type="button" id="abo-cp">Copier l'adresse</button>
+      <button type="button" id="abo-x">Fermer</button>
+    </div>
+    ${deja.length ? `<div class="deja"><b>Déjà généré depuis cet appareil</b>${
+      deja.map(d=>`${esc(d.nom)} — le ${new Date(d.le).toLocaleDateString("fr-FR")}`).join("<br>")
+    }</div>` : ""}
+  </div>`;
+  document.body.appendChild(v);
+  v.addEventListener("click", e=>{ if(e.target === v) fermerAbo(); });
+  document.getElementById("abo-x").addEventListener("click", fermerAbo);
+  document.getElementById("abo-go").addEventListener("click", ()=>{
+    noterAbo(nom, url);
+    // une ancre plutôt que location.href : le navigateur passe la main au
+    // calendrier sans que la page tente elle-même une navigation webcal://
+    const a = document.createElement("a");
+    a.href = enWebcal(url);
+    document.body.appendChild(a); a.click(); a.remove();
+    fermerAbo();
+    bandeau(`Votre calendrier doit s'ouvrir et proposer l'abonnement. S'il ne se passe rien,
+      utilisez « Copier l'adresse » et collez-la dans votre agenda.`);
+  });
+  document.getElementById("abo-cp").addEventListener("click", async ()=>{
+    noterAbo(nom, url);
+    try{ await navigator.clipboard.writeText(url); bandeau("Adresse copiée."); }
+    catch(e){ bandeau("Copie impossible ; l'adresse est : " + url); }
+  });
+
+  // Quand tout va bien, on ne dit rien : c'est le cas normal, et l'utilisateur n'a
+  // pas à connaître l'existence d'un numéro de version. On ne parle qu'en cas d'ennui,
+  // et pour lui donner la seule action utile de son point de vue : prévenir Raph.
+  const vs = await versionDuScript();
+  const el = document.getElementById("abo-v");
+  if(!el || vs === VERSION) return;
+  el.hidden = false;
+  el.textContent = vs === null
+    ? "Le planning ne répond pas en ce moment. Vous pouvez essayer quand même, mais si "
+      + "l'abonnement ne fonctionne pas, prévenez Raph : il y a un problème à corriger."
+    : "Attention : ce calendrier risque de ne pas être à jour. Prévenez Raph avant de vous "
+      + "y abonner, il y a un problème à corriger.";
 }
 
 /* ==================================================================
    4. RENDU
    ================================================================== */
-function boutonCal(i, titre){
-  return `<button class="cal" type="button" data-i="${i}" title="${titre}"
-    aria-label="${titre}">${ICONE_CAL}</button>`;
-}
-
 function ligneBloc(b){
   const cl = classeQui(b.qui);
   const ici = b.debut<=STATE.today && STATE.today<=b.fin;
@@ -657,8 +893,7 @@ function ligneBloc(b){
       <p class="when">${esc(libellePeriode(b))}</p>
       <p class="who">${esc(LIBELLE[b.qui]||b.qui)}${lieu}</p>
       ${b.com?`<p class="note">${esc(b.com)}</p>`:""}
-    </div>
-    <div class="fin">${tag}${boutonCal(b._i, "Ajouter cette période au calendrier")}</div>
+    </div>${tag}
   </div>`;
 }
 
@@ -674,16 +909,14 @@ function ligneTrajet(t){
       ? `${cap(libelleDate(t.date,true))} <span class="fleche">ou</span> ${libelleDate(t.date2,true)}`
       : esc(cap(libelleDate(t.date)));
   // seuls les commentaires propres au jour du trajet : voir joursTrajetFiltres
-  const com = comTrajet(t);
+  const com = comTrajet(t, STATE.parDate);
   return `<div class="row ${cl}${passe}${ici?" ici":""}"${ici?' id="ici"':""}>
     <div class="bar"></div>
     <div class="body">
       <p class="when">${quand}</p>
       <p class="who">${nom(t.de)} <span class="fleche">→</span> ${nom(t.vers)}</p>
       <p class="note">${t.note}${com ? " · " + esc(com) : ""}</p>
-    </div>
-    <div class="fin"><span class="tag">${esc(t.sens)}</span>${
-      boutonCal(t._i, "Ajouter ce trajet au calendrier")}</div>
+    </div><span class="tag">${esc(t.sens)}</span>
   </div>`;
 }
 
@@ -708,9 +941,7 @@ function renderList(){
   const l = elements();
   const res = document.getElementById("results");
   const trajets = STATE.periode === "trajets";
-  l.forEach((it,i)=> it._i = i);        // index stable, lu par les boutons « calendrier »
-  STATE.affiches = l;
-  majExport(l.length, trajets);
+  majExport(l.filter(x=> exportable(x, trajets)).length, l.length, trajets);
   if(!l.length){
     res.innerHTML = `<p class="empty">Rien ne correspond à cette combinaison de filtres.</p>`;
     majSub(0);
@@ -720,15 +951,19 @@ function renderList(){
   majSub(l.length, trajets);
 }
 
-/* Le bouton global exporte exactement ce que les filtres laissent voir :
-   la sélection, c'est la liste affichée. */
-function majExport(n, trajets){
-  const b = document.getElementById("exp");
+/* Le calendrier ne reçoit que ce qui est arrêté : son compte peut donc être
+   inférieur à celui affiché en tête de page. La ligne sous le bouton explique
+   l'écart plutôt que de laisser deviner. */
+function majExport(n, total, trajets){
+  const b = document.getElementById("abo"), note = document.getElementById("expnote");
   if(!b) return;
+  const nom = (k) => trajets ? (k>1?"trajets":"trajet") : (k>1?"périodes":"période");
   b.hidden = !n;
-  const mot = trajets ? (n>1?"trajets":"trajet") : (n>1?"périodes":"période");
-  const dem = n>1 ? "ces" : "ce" + (trajets ? "" : "tte");
-  b.innerHTML = ICONE_CAL + `<span>Ajouter ${dem} ${n>1?n+" ":""}${mot} au calendrier</span>`;
+  if(n) b.innerHTML = ICONE_CAL + `<span>S'abonner à cette vue</span>`;
+  const reste = total - n;
+  note.hidden = !reste;
+  if(reste) note.textContent = `${reste} ${nom(reste)} encore à définir ${
+    reste > 1 ? "n'y figureront pas" : "n'y figurera pas"}.`;
 }
 
 function majSub(n, trajets){
@@ -774,18 +1009,8 @@ function initTools(){
   q.addEventListener("keydown", e=>{ if(e.key==="Escape"){ q.value=""; maj(); } });
   clear.addEventListener("click", ()=>{ q.value=""; maj(); q.focus(); });
 
-  document.getElementById("results").addEventListener("click", e=>{
-    const btn = e.target.closest(".cal");
-    if(!btn) return;
-    const it = STATE.affiches[+btn.dataset.i];
-    if(!it) return;
-    const trajets = STATE.periode === "trajets";
-    versCalendrier([it], trajets, `anna-${trajets?it.date:it.debut}.ics`);
-  });
-  document.getElementById("exp").addEventListener("click", ()=>{
-    const trajets = STATE.periode === "trajets";
-    versCalendrier(STATE.affiches, trajets, trajets?"anna-trajets.ics":"anna-planning.ics");
-  });
+  const btnAbo = document.getElementById("abo");
+  if(btnAbo) btnAbo.addEventListener("click", ouvrirAbo);
 
   for(const btn of document.querySelectorAll(".frow button")){
     btn.addEventListener("click", ()=>{
@@ -805,7 +1030,7 @@ function initTools(){
 }
 
 function carteNow(){
-  const today=STATE.today, blocs=STATE.complets;
+  const today=STATE.today, blocs=STATE.modele.complets;
   const enCours = blocs.find(b=> b.debut<=today && today<=b.fin);
   const suivant = blocs.find(b=> b.debut>today);
   const bouton = enCours ? `<p class="goto"><button type="button" id="jump">Voir dans la liste</button></p>` : "";
@@ -842,13 +1067,12 @@ function carteNow(){
 function rendre(days){
   STATE.today = aujourdhui();
   STATE.jours = days;
-  STATE.parDate = Object.fromEntries(days.map(d=>[d.date, d]));
-  STATE.complets = grouper(days, d=> d.qui+"|"+d.ou+"|"+(d.typ==="vacances"?"V":"S"));
-  STATE.events   = grouper(days, d=> d.qui+"|"+d.ou, notable);
-  STATE.trajets  = trajetsDepuis(STATE.complets);
+  STATE.modele  = modele(days);
+  STATE.parDate = STATE.modele.parDate;
 
   document.getElementById("app").innerHTML = carteNow() + barreHTML() +
-    `<p class="expbar"><button id="exp" type="button" hidden></button></p>` +
+    (adresseScript() ? `<div class="expbar"><button id="abo" type="button" hidden></button>` +
+      `<p id="expnote" hidden></p></div>` : "") +
     `<div id="results"></div>`;
   initTools();
   renderList();
@@ -903,6 +1127,15 @@ async function deriver(reponse, sel, iter){
   return crypto.subtle.deriveKey({name:"PBKDF2", salt:sel, iterations:iter, hash:"SHA-256"},
                                  base, {name:"AES-GCM", length:256}, true, ["encrypt","decrypt"]);
 }
+/* Le coffre contient l'adresse du tableur et, éventuellement, celle du script,
+   séparées par un saut de ligne. Un coffre d'avant cette version ne contient que
+   la première : il continue de s'ouvrir sans rien changer. */
+function repartir(clair){
+  const [csv, script] = String(clair).split("\n");
+  SCRIPT_DECHIFFRE = (script || "").trim();
+  return (csv || "").trim();
+}
+
 async function ouvrir(coffre, cle){
   const p = partsCoffre(coffre);
   const clair = await crypto.subtle.decrypt({name:"AES-GCM", iv:b64.dec(p.iv)}, cle, b64.dec(p.txt));
@@ -949,7 +1182,7 @@ function demanderMotDePasse(erreurPrecedente){
     try{
       const p = partsCoffre(COFFRE);
       const cle = await deriver(mdp.value, b64.dec(p.sel), p.iter);
-      const url = await ouvrir(COFFRE, cle);         // échoue si le mot de passe est faux
+      const url = repartir(await ouvrir(COFFRE, cle)); // échoue si le mot de passe est faux
       await memoriser(cle);
       charger([{nom:"tableur (adresse déchiffrée)", url}]);
     }catch(e){
@@ -1048,7 +1281,8 @@ async function go(){
     }
     const cle = await cleMemorisee();
     if(cle){
-      try{ return charger([{nom:"tableur (adresse déchiffrée)", url: await ouvrir(COFFRE, cle)}]); }
+      try{ return charger([{nom:"tableur (adresse déchiffrée)",
+                            url: repartir(await ouvrir(COFFRE, cle))}]); }
       catch(e){ try{ localStorage.removeItem(CLE_STOCK); }catch(_){} }
     }
     return demanderMotDePasse();
