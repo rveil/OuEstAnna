@@ -298,7 +298,7 @@ function adresseScript(){ return P.get("script") || SCRIPT_DECHIFFRE || SCRIPT_U
    Ces lignes se fabriquent avec « Reglages.html », qui régénère un index.html
    complet — à garder sur votre ordinateur (ne pas le déposer sur GitHub).
    ------------------------------------------------------------------ */
-const COFFRE = "v2.300000.KRFyowwSB+PhwgvtrTBF2g==.gSzMsWpy2w3KUch3.027vMqhRfi9DSEULZYhnOK56iVZvHdm3ETxPkq499xSReEUQt/Fa2dZX1MZMzNwA7oCZuRtrcEASa1lMhD0L5c2K5Y/yBZdPx24trhZSZ4M/PRoVZq7GW4fwJ6n3iMu6qANGwkU6Ebz4rGbgjRN6B2/RYLqI4tqcNSCbRA+EW9vAnP8aboAAzq9Cy3daYPWprngHnv8qPA8pJ8XNbFtAeWJvzPnAEtQz9ZqZMwsDHyemaQdgHsrmH4h/S4H7CXHRYqiPZHzJp7je9rucd4c2dTzyh5gYnWmQwAEH0C0tJ4ZPEC7aFgP17EKbej2085JeY3xKJBmqstuJzhcXyDEil24Odc3of7mPHr+CwzKD2Acy/8Lwv/+fi949z1LQuBtjAqt2efaHm1immQ==";
+const COFFRE = "v2.300000.kwx4esZ5HweFQ5S18141JA==.6+baKaIiB02QU5vz.6auhsYSQnrnjlh7Bm4QtMLJlspn1OrjL2a5fKxyBBkDDv3GFTu55G8r0eZK5f8uVO3aiasKokJKOyRMkzxuEGNCySzIejw54NLhY4kYwDZUs1aFBVUk806YCBZcPgVa+mUUPrZSzkDxDiwARzxfwo2C11GaKonA4kkr7i9r4PNzk6JPZ4bO+ffXpdrg0qMHJUL+a159/nd/5lrHr5nrwkSQ4ICl7u5HNNnXp7ZsFIT9m4aJW4pztjpUFeLcnEZNLOUSibJMuXYid0gkl1uAU70oc5PaCQ011+hiNZAnvlE96xqy5RZfDBP/YjjS64tDkUdI1xxllQIByn++YQHPOSRW+kpHio05KX6Hh9RnEopNAHzRiWP/VUbtSb2gn2WmfMtiV/9hBaBwDcw==";
 const QUESTION = "Quelle est sa couleur préférée ?";
 
 /* ------------------------------------------------------------------ */
@@ -306,7 +306,7 @@ const P = new URLSearchParams(location.search);
 
 /* >>> LOGIQUE PARTAGÉE — engendré, ne pas modifier ici <<< */
 /* ==================================================================
-   LOGIQUE PARTAGÉE — version 3.1
+   LOGIQUE PARTAGÉE — version 3.2
    ------------------------------------------------------------------
    Ce bloc est IDENTIQUE, au caractère près, dans Pre-index.html et dans
    Code.gs. Il est engendré par build_logique.py à partir de
@@ -318,7 +318,7 @@ const P = new URLSearchParams(location.search);
    (?v=1) et vérifié par la page au moment de l'abonnement : si les
    deux ne correspondent pas, la page le dit.
    ================================================================== */
-const VERSION = "3.1";
+const VERSION = "3.2";
 
 const JOURS = {lun:"lundi",mar:"mardi",mer:"mercredi",jeu:"jeudi",ven:"vendredi",sam:"samedi",dim:"dimanche"};
 const MOIS = ["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
@@ -509,16 +509,28 @@ function icsTexte(s){
   return String(s).replace(/\\/g,"\\\\").replace(/;/g,"\\;")
                   .replace(/,/g,"\\,").replace(/\r?\n/g,"\\n");
 }
+/* Longueur en octets d'une chaîne UTF-8, comptée à la main.
+   TextEncoder, l'outil habituel, n'existe pas dans Apps Script : s'en servir
+   faisait échouer le calendrier avec « TextEncoder is not defined ». Le calcul
+   ci-dessous marche des deux côtés, ce qui est tout l'intérêt du bloc partagé. */
+function octets(s){
+  let n = 0;
+  for(const ch of s){
+    const c = ch.codePointAt(0);
+    n += c < 0x80 ? 1 : c < 0x800 ? 2 : c < 0x10000 ? 3 : 4;
+  }
+  return n;
+}
 /* RFC 5545 : 75 octets par ligne, les suivantes commencent par une espace. */
 function plier(ligne){
-  const enc = new TextEncoder();
-  let out = "", cur = "", limite = 75;
-  for(const ch of [...ligne]){
-    if(enc.encode(cur + ch).length > limite){
+  let out = "", cur = "", n = 0, limite = 75;
+  for(const ch of ligne){
+    const o = octets(ch);
+    if(n + o > limite){
       out += (out ? "\r\n" : "") + cur;
-      cur = " "; limite = 74;
+      cur = " "; n = 1; limite = 74;
     }
-    cur += ch;
+    cur += ch; n += o;
   }
   return out + (out ? "\r\n" : "") + cur;
 }
