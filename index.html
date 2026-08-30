@@ -158,6 +158,9 @@ h2{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink
   color:var(--ink-2)}
 .abo .actions .fort{background:var(--ink);color:var(--bg);border-color:var(--ink);flex:1}
 .abo .actions button:hover{border-color:var(--ink-3)}
+.abo .dit{margin:.45rem 0 0;font-size:.73rem;line-height:1.45;color:var(--ink-3)}
+.abo .lien{font:inherit;font-size:.73rem;padding:0;border:0;background:none;cursor:pointer;
+  color:var(--ink-2);text-decoration:underline;text-underline-offset:2px}
 .cal-item{display:flex;align-items:center;gap:.6rem;justify-content:space-between;
   border:1px solid var(--line);border-radius:10px;padding:.55rem .65rem;margin-bottom:.4rem}
 .cal-item.sel{border-color:var(--ink-3);background:var(--line-2)}
@@ -168,8 +171,12 @@ h2{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink
 .cal-item .cop{flex:0 0 auto;font:inherit;font-size:.75rem;font-weight:600;padding:.4rem .65rem;
   border-radius:8px;cursor:pointer;background:var(--ink);color:var(--bg);border:0}
 .abo .etapes{border:1px solid var(--line);border-radius:12px;padding:.7rem .75rem;margin-top:.9rem}
-.abo .etapes .titre{margin:0 0 .5rem;font-size:.7rem;font-weight:700;letter-spacing:.05em;
-  text-transform:uppercase;color:var(--ink-3)}
+.abo .etapes summary{cursor:pointer;font-size:.75rem;font-weight:600;color:var(--ink-3);
+  list-style:none}
+.abo .etapes summary::-webkit-details-marker{display:none}
+.abo .etapes summary::before{content:"▸ ";font-size:.9em}
+.abo .etapes[open] summary::before{content:"▾ "}
+.abo .etapes[open] summary{margin-bottom:.6rem}
 .abo .ongs{display:flex;flex-wrap:wrap;gap:.3rem;margin-bottom:.6rem}
 .abo .ong{font:inherit;font-size:.72rem;font-weight:600;padding:.28rem .55rem;border-radius:999px;
   cursor:pointer;background:transparent;border:1px solid var(--line);color:var(--ink-3)}
@@ -292,7 +299,7 @@ const SHEET_GID = "1504266455";
    Ces lignes se fabriquent avec « Reglages.html », qui régénère un index.html
    complet — à garder sur votre ordinateur (ne pas le déposer sur GitHub).
    ------------------------------------------------------------------ */
-const COFFRE = "v2.300000.i5aREZdccnT+qKTTttlrWw==.EcxqzWB6KYRKxExd.Ocdt4zLVlxjPVz6XCn6UH0M/a6ySraPiHLuXxS0P9Pq2Ruu+fdZJZcczOxeQSjZI3U8u+g1YHvtjpdJMM+Pn/8y7XvTLIAMe2UejrGo7q3PMjZPl2hfPmOlFuG95VxTuL9x2Z+jEXHvHggt8fEfRX02I1mdPCEbgmWISF8bWUCz/Ruy+OfxX+JqOIFJEdXMhKOJNB8cHUlF/Q+5ktoRH5UmTb5id0liOfsalddzcrdhEhScTh1nYk5o=";
+const COFFRE = "v2.300000.UnFuEfCPDh0Cgm1l09z0Vw==.KTHSMrX/HwkYt7e9.CGKEu9b0lQ53sVN9AtUJXEoJGM9LRm4NFGPwfmL7ujvhf6NyM51HxZ5qp6cgZUKtFQA6zUMh8uaPL4Q/cyb6xoc/6XrlUdaOJXgSVkw68VDmuMvphExORYO4h5XqdJttcMRnoeSYshBdOptaGo/rGtGJ0e6GU6dNenNEsgDNCUKCJrICs2x41qbXvKfqKiKstEucBIjQy3lQ58Dnarr1i9o/1bzd40HE2X96arYCcNLax/EIYaR4C4Y=";
 const QUESTION = "Quelle est sa couleur préférée ?";
 
 /* ------------------------------------------------------------------ */
@@ -921,31 +928,41 @@ function bandeau(texte){
 const DOSSIER_CAL = "cal/";
 const MEMO_ABO = "anna-abos";
 
-/* La marche à suivre dépend de l'agenda, et aucun ne se ressemble. On montre
-   celle de l'appareil, les autres restent à un clic. */
+/* Un seul bouton « S'abonner », mais il ne fait pas la même chose partout :
+   Apple s'abonne par le schéma webcal://, Google par une adresse à lui, et
+   Outlook n'a aucun raccourci. On devine l'agenda de l'appareil, on dit en une
+   phrase ce que le bouton va faire, et on laisse changer d'avis — un iPhone
+   peut très bien vivre sous Google Agenda.
+     agit : ce que fait le bouton  ·  dit : ce qu'on annonce  ·  pas : à la main */
 const MODES = [
-  {id:"ios",  lab:"iPhone ou iPad", pas:[
+  {id:"ios",  lab:"iPhone ou iPad", agit:"webcal",
+   dit:"L'application Calendrier va s'ouvrir et vous proposer l'abonnement.", pas:[
     "Ouvrez l'application <b>Calendrier</b>.",
     "Onglet <b>Calendriers</b>, en bas de l'écran.",
     "<b>Ajouter un calendrier</b> → <b>Ajouter un calendrier avec abonnement</b>.",
     "Collez l'adresse, puis <b>S'abonner</b>."]},
-  {id:"mac",  lab:"Mac", pas:[
+  {id:"mac",  lab:"Mac", agit:"webcal",
+   dit:"L'application Calendrier va s'ouvrir et vous proposer l'abonnement.", pas:[
     "Ouvrez l'application <b>Calendrier</b>.",
     "Menu <b>Fichier → Nouvel abonnement au calendrier</b>.",
     "Collez l'adresse, puis <b>S'abonner</b>."]},
-  {id:"goog", lab:"Google Agenda", pas:[
+  {id:"goog", lab:"Google Agenda", agit:"google",
+   dit:"Google Agenda va s'ouvrir dans un nouvel onglet et vous proposer l'ajout.", pas:[
     "Depuis un <b>ordinateur</b>, ouvrez <b>calendar.google.com</b>.",
     "À gauche, <b>Autres agendas</b> → le <b>+</b> → <b>À partir de l'URL</b>.",
     "Collez l'adresse, puis <b>Ajouter un agenda</b>.",
     "L'application mobile ne sait pas le faire elle-même, mais l'agenda ajouté sur " +
       "l'ordinateur apparaît ensuite sur le téléphone."]},
-  {id:"outl", lab:"Outlook", pas:[
+  {id:"outl", lab:"Outlook", agit:"copier",
+   dit:"Outlook n'a pas de raccourci : l'adresse sera copiée, et la marche à suivre "
+     + "s'affichera juste en dessous.", pas:[
     "Ouvrez <b>Outlook</b> sur le web, puis <b>Calendrier</b>.",
     "<b>Ajouter un calendrier</b> → <b>S'abonner à partir du web</b>.",
     "Collez l'adresse, puis <b>Importer</b>.",
     "Outlook rafraîchit les abonnements plus lentement que les autres : comptez " +
       "parfois plusieurs heures avant de voir un changement."]},
 ];
+const modeDit = id => (MODES.find(m=> m.id === id) || MODES[0]);
 function modeProbable(){
   const ua = navigator.userAgent;
   if(/iPad|iPhone|iPod/.test(ua) || (/Mac/.test(ua) && navigator.maxTouchPoints > 1)) return "ios";
@@ -964,6 +981,17 @@ function adresseAbo(){
   return new URL(DOSSIER_CAL + nomFichier(vueCourante(), [...STATE.qui], [...STATE.ou]),
                  location.href).href;
 }
+
+/* webcal:// est le schéma qui dit au système « abonne-toi » plutôt que
+   « télécharge ». Le Calendrier d'Apple le traduit en http:// — pas https —
+   ce qui condamnait l'ancienne piste Apps Script, Google ne servant qu'en
+   https. GitHub Pages, lui, répond en http et redirige vers https : le
+   schéma redevient utilisable. On garde malgré tout la copie de l'adresse
+   sous la main, tous les agendas ne connaissant pas webcal. */
+const enWebcal = u => u.replace(/^https?:\/\//, "webcal://");
+/* Google Agenda sait s'abonner en un clic, mais par une adresse à lui. */
+const versGoogleAgenda = u =>
+  "https://calendar.google.com/calendar/r?cid=" + encodeURIComponent(u);
 
 async function listeCalendriers(){
   const r = await fetch(new URL(DOSSIER_CAL + "index.json", location.href).href,
@@ -1040,17 +1068,21 @@ async function ouvrirAbo(){
       évènements en double.</p>
     <p class="alerte" id="abo-v" hidden></p>
 
-    <div class="etapes">
-      <p class="titre">Comment s'abonner</p>
+    <div class="actions">
+      <button type="button" class="fort" id="abo-go">S'abonner</button>
+      <button type="button" id="abo-cp">Copier l'adresse</button>
+    </div>
+    <p class="dit"><span id="abo-dit"></span>
+      <button type="button" class="lien" id="abo-autre">Ce n'est pas mon agenda</button></p>
+
+    <details class="etapes">
+      <summary>Si rien ne se passe, ou pour un autre agenda</summary>
       <div class="ongs">${onglets}</div>
       ${modes}
       <input id="abo-u" readonly value="${esc(url)}">
-    </div>
+    </details>
 
-    <div class="actions">
-      <button type="button" class="fort" id="abo-cp">Copier l'adresse</button>
-      <button type="button" id="abo-x">Fermer</button>
-    </div>
+    <div class="actions"><button type="button" id="abo-x">Fermer</button></div>
     ${deja.length ? `<div class="deja"><b>Adresses déjà copiées depuis cet appareil</b>${
       deja.map(d=>`${esc(d.nom)} — le ${new Date(d.le).toLocaleDateString("fr-FR")}`).join("<br>")
     }</div>` : ""}
@@ -1058,22 +1090,60 @@ async function ouvrirAbo(){
   document.body.appendChild(v);
   v.addEventListener("click", e=>{ if(e.target === v) fermerAbo(); });
   document.getElementById("abo-x").addEventListener("click", fermerAbo);
-  for(const b of v.querySelectorAll(".ong")) b.addEventListener("click", ()=>{
-    for(const x of v.querySelectorAll(".ong")) x.classList.toggle("on", x === b);
-    for(const o of v.querySelectorAll(".pas")) o.hidden = o.dataset.m !== b.dataset.m;
-  });
 
   const champ = document.getElementById("abo-u");
   champ.addEventListener("focus", ()=> champ.select());
-  document.getElementById("abo-cp").addEventListener("click", async ()=>{
-    noterAbo(nom);
+
+  /* L'agenda visé : deviné au départ, changé par les onglets du repli. Le bouton
+     et la phrase le suivent, pour qu'il n'y ait jamais qu'un seul bouton à lire. */
+  let vise = mode;
+  const pli = v.querySelector(".etapes");
+  function majMode(){
+    document.getElementById("abo-dit").textContent = modeDit(vise).dit + " ";
+    for(const x of v.querySelectorAll(".ong")) x.classList.toggle("on", x.dataset.m === vise);
+    for(const o of v.querySelectorAll(".pas")) o.hidden = o.dataset.m !== vise;
+  }
+  for(const b of v.querySelectorAll(".ong"))
+    b.addEventListener("click", ()=>{ vise = b.dataset.m; majMode(); });
+  document.getElementById("abo-autre").addEventListener("click", ()=>{
+    pli.open = true;
+    pli.scrollIntoView({behavior:"smooth", block:"nearest"});
+  });
+  majMode();
+
+  async function copier(mot){
     try{
       await navigator.clipboard.writeText(url);
-      bandeau("Adresse copiée. Collez-la dans votre calendrier en suivant les étapes ci-dessus.");
+      bandeau(mot);
     }catch(e){
       champ.focus(); champ.select();
       bandeau("Copie refusée par le navigateur. L'adresse est sélectionnée : copiez-la à la main.");
     }
+  }
+
+  document.getElementById("abo-go").addEventListener("click", ()=>{
+    noterAbo(nom);
+    const agit = modeDit(vise).agit;
+    if(agit === "webcal"){
+      // une ancre plutôt qu'une navigation : le navigateur passe la main au
+      // calendrier sans que la page tente elle-même d'aller sur webcal://
+      const a = document.createElement("a");
+      a.href = enWebcal(url);
+      document.body.appendChild(a); a.click(); a.remove();
+      bandeau(`Votre calendrier devrait s'ouvrir et proposer l'abonnement. S'il ne se passe
+        rien, dépliez « Si rien ne se passe » et copiez l'adresse.`);
+    }else if(agit === "google"){
+      window.open(versGoogleAgenda(url), "_blank", "noopener");
+      bandeau(`Google Agenda s'ouvre dans un autre onglet. S'il ne s'ouvre pas, votre
+        navigateur a bloqué la fenêtre : autorisez-la, ou copiez l'adresse.`);
+    }else{
+      pli.open = true;
+      copier("Adresse copiée. La marche à suivre est dépliée juste en dessous.");
+    }
+  });
+  document.getElementById("abo-cp").addEventListener("click", ()=>{
+    noterAbo(nom);
+    copier("Adresse copiée. Dépliez « Si rien ne se passe » pour la marche à suivre.");
   });
 
   // Le tableur et la page doivent porter la même logique, sinon le calendrier et
