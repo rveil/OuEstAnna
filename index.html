@@ -158,6 +158,19 @@ h2{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink
   color:var(--ink-2)}
 .abo .actions .fort{background:var(--ink);color:var(--bg);border-color:var(--ink);flex:1}
 .abo .actions button:hover{border-color:var(--ink-3)}
+.abo .etapes{border:1px solid var(--line);border-radius:12px;padding:.7rem .75rem;margin-top:.9rem}
+.abo .etapes .titre{margin:0 0 .5rem;font-size:.7rem;font-weight:700;letter-spacing:.05em;
+  text-transform:uppercase;color:var(--ink-3)}
+.abo .ongs{display:flex;flex-wrap:wrap;gap:.3rem;margin-bottom:.6rem}
+.abo .ong{font:inherit;font-size:.72rem;font-weight:600;padding:.28rem .55rem;border-radius:999px;
+  cursor:pointer;background:transparent;border:1px solid var(--line);color:var(--ink-3)}
+.abo .ong.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.abo ol.pas{margin:0;padding-left:1.15rem;font-size:.78rem;line-height:1.5;color:var(--ink-2)}
+.abo ol.pas li{margin:.28rem 0}
+.abo ol.pas[hidden]{display:none}
+.abo #abo-u{width:100%;box-sizing:border-box;margin-top:.7rem;font-family:ui-monospace,
+  SFMono-Regular,Menlo,monospace;font-size:.7rem;padding:.45rem .5rem;border-radius:8px;
+  border:1px solid var(--line);background:var(--line-2);color:var(--ink-2)}
 .abo .deja{font-size:.75rem;color:var(--ink-3);border-top:1px solid var(--line);
   margin-top:.9rem;padding-top:.7rem}
 .abo .deja b{display:block;color:var(--ink-2);font-weight:600;margin-bottom:.25rem}
@@ -282,10 +295,10 @@ function adresseScript(){ return P.get("script") || SCRIPT_DECHIFFRE || SCRIPT_U
    de la reconstituer. Mettre alors CSV_URL à "".
    QUESTION est l'indice affiché au visiteur (« Quel est le nom de son doudou ? ») :
    il reste en clair, c'est voulu.
-   Ces trois lignes se fabriquent avec « outil-mot-de-passe.html », qui régénère un
-   index.html complet — à garder sur votre ordinateur (ne pas le déposer sur GitHub).
+   Ces lignes se fabriquent avec « Reglages.html », qui régénère un index.html
+   complet — à garder sur votre ordinateur (ne pas le déposer sur GitHub).
    ------------------------------------------------------------------ */
-const COFFRE = "v2.300000.TV0duvBdXVHzac0w6JZ2OQ==.vMCZ1thafsCPQCHa.g7i8wuiSSqoFcz/EA7yoa4g4tRoAG83OhpVce7tjEGseIbSO445QCQyfjIo5RbIZCRkjDEOwU9wLu+ojv4Cm8Jptf4FkoMPU6k2RIVAM2TkBpwUNMyJLjBeclGFWmkKk3y3VtWwQEwyuXFrCx98AzbY5cX2fsKNjaKfEL+OQBg2O0bR1poBeB2yM/EMS0y/Tni/pBSOOAcj4mwd/QjxYohATLl70SqNiXvyyOmfN9I+g3AoINOP+tGHgBQUxysjYFW+bE80JcJVPpGLwj/IN8D1rZfVmUf58St2H7U6EiZn4YeUGZTfwe3Tfq7hlqMjH182PiBG8gY+U6WNUoQo6Am+fTlDf4pQKfhPtwVx1pkrhRb+Lwrpo292aR8BreiqPxkYpl/7siYWdyA==";
+const COFFRE = "v2.300000.KRFyowwSB+PhwgvtrTBF2g==.gSzMsWpy2w3KUch3.027vMqhRfi9DSEULZYhnOK56iVZvHdm3ETxPkq499xSReEUQt/Fa2dZX1MZMzNwA7oCZuRtrcEASa1lMhD0L5c2K5Y/yBZdPx24trhZSZ4M/PRoVZq7GW4fwJ6n3iMu6qANGwkU6Ebz4rGbgjRN6B2/RYLqI4tqcNSCbRA+EW9vAnP8aboAAzq9Cy3daYPWprngHnv8qPA8pJ8XNbFtAeWJvzPnAEtQz9ZqZMwsDHyemaQdgHsrmH4h/S4H7CXHRYqiPZHzJp7je9rucd4c2dTzyh5gYnWmQwAEH0C0tJ4ZPEC7aFgP17EKbej2085JeY3xKJBmqstuJzhcXyDEil24Odc3of7mPHr+CwzKD2Acy/8Lwv/+fi949z1LQuBtjAqt2efaHm1immQ==";
 const QUESTION = "Quelle est sa couleur préférée ?";
 
 /* ------------------------------------------------------------------ */
@@ -295,7 +308,7 @@ const P = new URLSearchParams(location.search);
 /* ==================================================================
    LOGIQUE PARTAGÉE — version 3.1
    ------------------------------------------------------------------
-   Ce bloc est IDENTIQUE, au caractère près, dans index.html et dans
+   Ce bloc est IDENTIQUE, au caractère près, dans Pre-index.html et dans
    Code.gs. Il est engendré par build_logique.py à partir de
    logique.js : ne rien modifier dans les fichiers engendrés, mais
    dans logique.js, puis régénérer les deux ensemble.
@@ -774,8 +787,10 @@ function adresseAbo(){
   if(STATE.ou.size)  par.set("ou",  [...STATE.ou].join(","));
   return base + (base.includes("?") ? "&" : "?") + par.toString();
 }
-/* webcal:// est ce qui déclenche « s'abonner » plutôt que « télécharger ». */
-const enWebcal = u => u.replace(/^https?:\/\//, "webcal://");
+/* Pas de webcal:// ici, et c'est un choix, pas un oubli : le Calendrier d'Apple
+   traduit webcal:// par http:// — pas https — et Google refuse le http. L'essai
+   se solde par « Connexion non sécurisée » puis « Échec de la validation ». On
+   donne donc l'adresse https à copier, ce que tous les agendas acceptent. */
 
 function memoAbos(){
   try{ return JSON.parse(localStorage.getItem(MEMO_ABO) || "[]"); }catch(e){ return []; }
@@ -788,15 +803,56 @@ function noterAbo(nom, url){
 
 /* Ce que l'abonné verra, en toutes lettres. Le but est qu'il ne découvre pas
    après coup que son calendrier ne montre qu'une partie du planning. */
+/* Les intitulés des filtres sont faits pour des boutons, pas pour une phrase :
+   « avec Autres » ou « à Paris ou Corenc » se lisent mal. On les retraduit. */
+const DIT_QUI = {"Autres":"quelqu'un d'autre", "À définir":"une personne encore à définir"};
+const DIT_OU  = {"Paris":"à Paris", "Corenc":"à Corenc",
+                 "Autres":"ailleurs", "À définir":"dans un lieu encore à définir"};
 function resumeAbo(){
   const vue = vueCourante();
   const quoi = vue === "trajets" ? "les trajets"
              : vue === "tout"    ? "tout le planning, semaines d'école comprises"
              :                     "les week-ends et les vacances";
   const f = [];
-  if(STATE.qui.size) f.push("avec " + [...STATE.qui].join(" ou "));
-  if(STATE.ou.size)  f.push("à " + [...STATE.ou].join(" ou "));
-  return quoi + (f.length ? ", " + f.join(", ") : "") + ".";
+  if(STATE.qui.size)
+    f.push("avec " + [...STATE.qui].map(q=> DIT_QUI[q] || q).join(" ou "));
+  if(STATE.ou.size)
+    f.push([...STATE.ou].map(o=> DIT_OU[o] || "à " + o).join(" ou "));
+  return quoi + (f.length ? " " + f.join(", ") : "");
+}
+
+/* La marche à suivre dépend de l'agenda, et aucun ne se ressemble. On montre
+   celle de l'appareil, les autres restent dépliables — un iPhone qui utilise
+   Google Agenda n'est pas un cas rare. */
+const MODES = [
+  {id:"ios",  lab:"iPhone ou iPad", pas:[
+    "Ouvrez l'application <b>Calendrier</b>.",
+    "Onglet <b>Calendriers</b>, en bas de l'écran.",
+    "<b>Ajouter un calendrier</b> → <b>Ajouter un calendrier avec abonnement</b>.",
+    "Collez l'adresse, puis <b>S'abonner</b>."]},
+  {id:"mac",  lab:"Mac", pas:[
+    "Ouvrez l'application <b>Calendrier</b>.",
+    "Menu <b>Fichier → Nouvel abonnement au calendrier</b>.",
+    "Collez l'adresse, puis <b>S'abonner</b>."]},
+  {id:"goog", lab:"Google Agenda", pas:[
+    "Depuis un <b>ordinateur</b>, ouvrez <b>calendar.google.com</b>.",
+    "À gauche, <b>Autres agendas</b> → le <b>+</b> → <b>À partir de l'URL</b>.",
+    "Collez l'adresse, puis <b>Ajouter un agenda</b>.",
+    "L'application mobile ne sait pas le faire elle-même, mais l'agenda ajouté sur " +
+      "l'ordinateur apparaît ensuite sur le téléphone."]},
+  {id:"outl", lab:"Outlook", pas:[
+    "Ouvrez <b>Outlook</b> sur le web, puis <b>Calendrier</b>.",
+    "<b>Ajouter un calendrier</b> → <b>S'abonner à partir du web</b>.",
+    "Collez l'adresse, puis <b>Importer</b>.",
+    "Outlook rafraîchit les abonnements plus lentement que les autres : comptez " +
+      "parfois plusieurs heures avant de voir un changement."]},
+];
+function modeProbable(){
+  const ua = navigator.userAgent;
+  if(/iPad|iPhone|iPod/.test(ua) || (/Mac/.test(ua) && navigator.maxTouchPoints > 1)) return "ios";
+  if(/Android/.test(ua)) return "goog";
+  if(/Mac/.test(ua)) return "mac";
+  return "goog";
 }
 
 async function versionDuScript(){
@@ -818,46 +874,76 @@ async function ouvrirAbo(){
   const n = pourCalendrier(STATE.modele, vue, fQui, fOu).length;
   const q = requete();
   const deja = memoAbos();
+  const mode = modeProbable();
+
+  const onglets = MODES.map(m =>
+    `<button type="button" class="ong${m.id===mode?" on":""}" data-m="${m.id}">${m.lab}</button>`
+  ).join("");
+  const modes = MODES.map(m =>
+    `<ol class="pas" data-m="${m.id}"${m.id===mode?"":" hidden"}>${
+      m.pas.map(x=>`<li>${x}</li>`).join("")}</ol>`).join("");
 
   const v = document.createElement("div");
   v.className = "voile";
   v.innerHTML = `<div class="abo" role="dialog" aria-modal="true" aria-label="S'abonner">
     <h3>S'abonner à cette vue</h3>
-    <p class="quoi"><b>${esc(nom)}</b><br>Ce calendrier montrera ${esc(resumeAbo())}
-      Soit ${n} ${n>1?"évènements":"évènement"} pour l'instant, et il suivra le tableur tout seul.</p>
+
+    <p class="quoi"><b>${esc(nom)}</b><br>
+      En vous abonnant à cette vue, vous ajouterez à votre calendrier ${esc(resumeAbo())}.
+      Compte tenu des filtres que vous avez sélectionnés, cet abonnement y ajoutera
+      <b>${n} ${n>1?"évènements":"évènement"}</b>. Seuls les évènements « complets » sont
+      ajoutés (ceux pour lesquels la personne et le lieu sont renseignés).<br><br>
+      Votre calendrier se mettra ensuite à jour tout seul, au fur et à mesure que Marie et Raph
+      renseignent le tableur : les évènements modifiés le seront chez vous, et les nouveaux
+      s'ajouteront. Comptez un délai — chaque appareil rafraîchit ses abonnements à son propre
+      rythme, souvent une fois par jour.</p>
+
     ${q ? `<p class="avert">Votre recherche « ${esc(q)} » n'est pas reprise : un abonnement
       ne retient que les filtres.</p>` : ""}
-    <p class="avert">Les filtres sont inscrits dans le lien une fois pour toutes. Pour en changer
-      plus tard, supprimez ce calendrier de votre téléphone puis abonnez-vous à nouveau — sans quoi
-      vous verrez les deux en même temps.</p>
+    <p class="avert">Les filtres que vous avez sélectionnés s'appliquent à cet abonnement. Si vous
+      souhaitez plus tard vous abonner avec d'autres filtres, supprimez d'abord l'abonnement en
+      cours dans votre calendrier, puis abonnez-vous à nouveau — sans quoi vous verriez les
+      évènements en double.</p>
     <p class="alerte" id="abo-v" hidden></p>
+
+    <div class="etapes">
+      <p class="titre">Comment s'abonner</p>
+      <div class="ongs">${onglets}</div>
+      ${modes}
+      <input id="abo-u" readonly value="${esc(url)}">
+    </div>
+
     <div class="actions">
-      <button type="button" class="fort" id="abo-go">S'abonner</button>
-      <button type="button" id="abo-cp">Copier l'adresse</button>
+      <button type="button" class="fort" id="abo-cp">Copier l'adresse</button>
       <button type="button" id="abo-x">Fermer</button>
     </div>
-    ${deja.length ? `<div class="deja"><b>Déjà généré depuis cet appareil</b>${
+    ${deja.length ? `<div class="deja"><b>Adresses déjà copiées depuis cet appareil</b>${
       deja.map(d=>`${esc(d.nom)} — le ${new Date(d.le).toLocaleDateString("fr-FR")}`).join("<br>")
     }</div>` : ""}
   </div>`;
   document.body.appendChild(v);
   v.addEventListener("click", e=>{ if(e.target === v) fermerAbo(); });
   document.getElementById("abo-x").addEventListener("click", fermerAbo);
-  document.getElementById("abo-go").addEventListener("click", ()=>{
-    noterAbo(nom, url);
-    // une ancre plutôt que location.href : le navigateur passe la main au
-    // calendrier sans que la page tente elle-même une navigation webcal://
-    const a = document.createElement("a");
-    a.href = enWebcal(url);
-    document.body.appendChild(a); a.click(); a.remove();
-    fermerAbo();
-    bandeau(`Votre calendrier doit s'ouvrir et proposer l'abonnement. S'il ne se passe rien,
-      utilisez « Copier l'adresse » et collez-la dans votre agenda.`);
+
+  for(const b of v.querySelectorAll(".ong")) b.addEventListener("click", ()=>{
+    for(const x of v.querySelectorAll(".ong")) x.classList.toggle("on", x === b);
+    for(const o of v.querySelectorAll(".pas")) o.hidden = o.dataset.m !== b.dataset.m;
   });
+
+  const champ = document.getElementById("abo-u");
+  champ.addEventListener("focus", ()=> champ.select());
   document.getElementById("abo-cp").addEventListener("click", async ()=>{
     noterAbo(nom, url);
-    try{ await navigator.clipboard.writeText(url); bandeau("Adresse copiée."); }
-    catch(e){ bandeau("Copie impossible ; l'adresse est : " + url); }
+    try{
+      await navigator.clipboard.writeText(url);
+      bandeau("Adresse copiée. Collez-la dans votre calendrier en suivant les étapes ci-dessus.");
+    }catch(e){
+      // Sur certains navigateurs le presse-papier est refusé : on sélectionne le
+      // texte pour que la copie manuelle demande un geste de moins.
+      champ.focus(); champ.select();
+      bandeau("Copie automatique refusée par le navigateur. L'adresse est sélectionnée : "
+            + "copiez-la à la main.");
+    }
   });
 
   // Quand tout va bien, on ne dit rien : c'est le cas normal, et l'utilisateur n'a
