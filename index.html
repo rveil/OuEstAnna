@@ -158,6 +158,15 @@ h2{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink
   color:var(--ink-2)}
 .abo .actions .fort{background:var(--ink);color:var(--bg);border-color:var(--ink);flex:1}
 .abo .actions button:hover{border-color:var(--ink-3)}
+.cal-item{display:flex;align-items:center;gap:.6rem;justify-content:space-between;
+  border:1px solid var(--line);border-radius:10px;padding:.55rem .65rem;margin-bottom:.4rem}
+.cal-item.sel{border-color:var(--ink-3);background:var(--line-2)}
+.cal-item b{display:block;font-size:.82rem}
+.cal-item .nb{display:block;font-size:.72rem;color:var(--ink-3);margin-top:.1rem}
+.cal-item .corr{font-size:.66rem;font-weight:600;text-transform:uppercase;letter-spacing:.03em;
+  color:var(--raph);margin-left:.4rem}
+.cal-item .cop{flex:0 0 auto;font:inherit;font-size:.75rem;font-weight:600;padding:.4rem .65rem;
+  border-radius:8px;cursor:pointer;background:var(--ink);color:var(--bg);border:0}
 .abo .etapes{border:1px solid var(--line);border-radius:12px;padding:.7rem .75rem;margin-top:.9rem}
 .abo .etapes .titre{margin:0 0 .5rem;font-size:.7rem;font-weight:700;letter-spacing:.05em;
   text-transform:uppercase;color:var(--ink-3)}
@@ -273,21 +282,6 @@ const SHEET_ID = "";
 const SHEET_GID = "1504266455";
 
 /* ------------------------------------------------------------------
-   ABONNEMENT AU CALENDRIER (facultatif)
-   Adresse de l'application web Apps Script qui sert le planning au format
-   iCalendar — celle qui se termine par /exec. Tant qu'elle est vide, la page
-   ne propose pas l'abonnement, et tout le reste fonctionne normalement.
-   Voir le README pour le déploiement.
-   ------------------------------------------------------------------ */
-const SCRIPT_URL = "";
-/* Pour essayer une autre adresse sans toucher au fichier : …/index.html?script=… */
-/* Quand la page est protégée, l'adresse du script est chiffrée avec celle du
-   tableur : elle n'apparaît qu'après le mot de passe, et le lien d'abonnement
-   n'ouvre donc pas de porte à côté de celle qu'on ferme. */
-let SCRIPT_DECHIFFRE = "";
-function adresseScript(){ return P.get("script") || SCRIPT_DECHIFFRE || SCRIPT_URL; }
-
-/* ------------------------------------------------------------------
    MOT DE PASSE (facultatif)
    Tant que COFFRE est vide, la page s'ouvre sans mot de passe.
    Une fois rempli, l'adresse du tableur n'existe plus en clair dans ce
@@ -298,7 +292,7 @@ function adresseScript(){ return P.get("script") || SCRIPT_DECHIFFRE || SCRIPT_U
    Ces lignes se fabriquent avec « Reglages.html », qui régénère un index.html
    complet — à garder sur votre ordinateur (ne pas le déposer sur GitHub).
    ------------------------------------------------------------------ */
-const COFFRE = "v2.300000.6mZ9NeOpozUnRzVzbYKtyg==.9adoNn9QpIQBZcED.oiLrQp434UIhtdIHUunRZyjAOOtts0EtQO+dHHHy/o2MAVmaY/uMzBdlH0MkbBNr9NiKlpqlmnjAR92JgQA52m4/ZB3pfkiZ5i9ODqbyc06dHJCGv3zo/L44ZOC6RfQ2KePsfTPngpf94acq3od0NQLVyoBpfumtO2leMQFHy/VJcxtDO2JXbNW09F4cjSKAC8h/rk2g3P37G7TiqZfwjyvI9ZOwEMOZJaOa1RYba1W9pHNHedhJCH5vpUgXSVgV+2jyQ5HH6ntbZn7EVvPxiAxuG/1oe7qdmcjV5TCl5hWJy4zJfERX/JGYKKn7pRtdPuyqqeha4HjcjCj0YU/geWo44PbIb4dQd8Astnoj54iHWv90XK4OnxYbqS5gKYmj8fNCgCc3GJz9wg==";
+const COFFRE = "v2.300000.i5aREZdccnT+qKTTttlrWw==.EcxqzWB6KYRKxExd.Ocdt4zLVlxjPVz6XCn6UH0M/a6ySraPiHLuXxS0P9Pq2Ruu+fdZJZcczOxeQSjZI3U8u+g1YHvtjpdJMM+Pn/8y7XvTLIAMe2UejrGo7q3PMjZPl2hfPmOlFuG95VxTuL9x2Z+jEXHvHggt8fEfRX02I1mdPCEbgmWISF8bWUCz/Ruy+OfxX+JqOIFJEdXMhKOJNB8cHUlF/Q+5ktoRH5UmTb5id0liOfsalddzcrdhEhScTh1nYk5o=";
 const QUESTION = "Quelle est sa couleur préférée ?";
 
 /* ------------------------------------------------------------------ */
@@ -306,7 +300,7 @@ const P = new URLSearchParams(location.search);
 
 /* >>> LOGIQUE PARTAGÉE — engendré, ne pas modifier ici <<< */
 /* ==================================================================
-   LOGIQUE PARTAGÉE — version 3.3
+   LOGIQUE PARTAGÉE — version 4.0
    ------------------------------------------------------------------
    Ce bloc est IDENTIQUE, au caractère près, dans Pre-index.html et dans
    Code.gs. Il est engendré par build_logique.py à partir de
@@ -318,7 +312,7 @@ const P = new URLSearchParams(location.search);
    (?v=1) et vérifié par la page au moment de l'abonnement : si les
    deux ne correspondent pas, la page le dit.
    ================================================================== */
-const VERSION = "3.3";
+const VERSION = "4.0";
 
 const JOURS = {lun:"lundi",mar:"mardi",mer:"mercredi",jeu:"jeudi",ven:"vendredi",sam:"samedi",dim:"dimanche"};
 const MOIS = ["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
@@ -540,8 +534,21 @@ function jourPlus(iso, n){
   return d.toISOString().slice(0,10);
 }
 const compact = iso => iso.replace(/-/g,"");
-/* Calculé à l'appel : côté script, le fichier est refabriqué à chaque requête. */
-function horodatage(){ return new Date().toISOString().replace(/[-:]/g,"").replace(/\.\d+/,""); }
+/* DTSTAMP. Calculé à l'appel, sauf si on impose une valeur.
+   Pourquoi cette possibilité : quand les fichiers sont publiés sur GitHub, un
+   DTSTAMP qui bouge à chaque exécution rendrait chaque fichier différent du
+   précédent, et créerait un commit toutes les trois heures même sans le moindre
+   changement de planning. On fige alors l'horodatage sur la date de dernière
+   modification du tableur : tant que le planning ne bouge pas, le fichier est
+   identique au caractère près et rien n'est publié. */
+let HORODATAGE_IMPOSE = null;
+function horodatage(){
+  if(HORODATAGE_IMPOSE) return HORODATAGE_IMPOSE;
+  return new Date().toISOString().replace(/[-:]/g,"").replace(/\.\d+/,"");
+}
+function imposerHorodatage(d){
+  HORODATAGE_IMPOSE = d ? new Date(d).toISOString().replace(/[-:]/g,"").replace(/\.\d+/,"") : null;
+}
 
 function evenement({debut, fin, titre, lieu, note, cle}){
   const L = ["BEGIN:VEVENT",
@@ -727,11 +734,84 @@ const VUE_CODE = inverse(CODE_VUE), QUI_CODE = inverse(CODE_QUI), OU_CODE = inve
 function cheminAbo(vue, fQui, fOu){
   const lettres = (l, t) => (l || []).map(x=> t[x] || "").join("");
   const q = lettres(fQui, CODE_QUI), o = lettres(fOu, CODE_OU);
+  // Vue par défaut et aucun filtre : on rend l'adresse nue, sans rien après
+  // /exec. C'est la forme dont on sait qu'elle s'abonne partout — autant ne
+  // pas lui ajouter un segment dont on n'a pas besoin.
+  if(vue === "evenements" && !q && !o) return "";
   let c = "/" + (CODE_VUE[vue] || "e");
   if(q || o) c += "/" + (q || "-");
   if(o)      c += "/" + o;
   return c;
 }
+/* ------------------------------------------------------------------
+   Un calendrier par combinaison de filtres — mais pas 1536.
+   ------------------------------------------------------------------
+   L'écran permet 3 vues × 32 ensembles de personnes × 16 de lieux, soit
+   1536 combinaisons. Beaucoup sont équivalentes, pour trois raisons qui
+   ne dépendent pas des données — donc sûres, et calculables des deux
+   côtés à l'identique :
+
+   · « À définir » ne change jamais rien : ces évènements ne partent
+     jamais au calendrier, cochée ou non la case ne fait aucune
+     différence.
+   · Tout cocher revient à ne rien cocher : tout évènement exportable
+     tombe forcément dans l'une des catégories.
+   · « Tous les 3 » est déjà inclus par « Raph » et par « Marie »
+     (voir elargirQui) : l'ajouter à côté de l'un d'eux ne change rien.
+
+   Il reste 3 × 10 × 7 = 210 calendriers réellement distincts. C'est ce
+   qu'on publie, y compris ceux qui sont vides aujourd'hui : un nom de
+   fichier est une adresse d'abonnement, elle doit rester valable même
+   si le planning change. Rien ici ne dépend du contenu du tableur.
+   ------------------------------------------------------------------ */
+function canoniser(vue, fQui, fOu){
+  const ORDRE_QUI = ["Raph","Marie","Tous les 3","Autres"];
+  const ORDRE_OU  = ["Paris","Corenc","Autres"];
+  let q = ORDRE_QUI.filter(x=> (fQui||[]).indexOf(x) >= 0);
+  let o = ORDRE_OU.filter(x=> (fOu||[]).indexOf(x) >= 0);
+  /* Cocher « À définir » et rien d'autre, ce n'est pas « aucun filtre » : c'est
+     un filtre qui ne retient rien, puisque ces évènements ne partent jamais au
+     calendrier. Sans ce garde-fou, retirer « À définir » d'un ensemble qui ne
+     contenait que lui transformerait « rien » en « tout ». */
+  const vide = ((fQui||[]).length > 0 && q.length === 0)
+            || ((fOu ||[]).length > 0 && o.length === 0);
+  // « Tous les 3 » est redondant à côté de Raph ou de Marie
+  if(q.indexOf("Raph") >= 0 || q.indexOf("Marie") >= 0)
+    q = q.filter(x=> x !== "Tous les 3");
+  if(q.length === ORDRE_QUI.length) q = [];      // tout cocher = ne rien cocher
+  if(o.length === ORDRE_OU.length)  o = [];
+  return {vue: (vue === "tout" || vue === "trajets") ? vue : "evenements",
+          fQui:q, fOu:o, vide:vide};
+}
+
+/* Le nom du fichier découle de la forme canonique, et de rien d'autre. */
+function nomFichier(vue, fQui, fOu){
+  const c = canoniser(vue, fQui, fOu);
+  // Toutes les combinaisons qui ne retiennent rien partagent le même fichier vide.
+  if(c.vide) return "vide.ics";
+  const l = (t, s) => s.map(function(x){ return t[x]; }).join("") || "0";
+  return [CODE_VUE[c.vue], l(CODE_QUI, c.fQui), l(CODE_OU, c.fOu)].join("-") + ".ics";
+}
+
+/* Les 210 combinaisons, dans un ordre stable. */
+function toutesCombinaisons(){
+  const parties = a => a.reduce(function(acc,x){
+    return acc.concat(acc.map(function(s){ return s.concat([x]); })); }, [[]]);
+  const vu = {}, out = [];
+  ["evenements","tout","trajets"].forEach(function(v){
+    parties(["Raph","Marie","Tous les 3","Autres"]).forEach(function(q){
+      parties(["Paris","Corenc","Autres"]).forEach(function(o){
+        const c = canoniser(v, q, o), f = nomFichier(v, q, o);
+        if(vu[f]) return;
+        vu[f] = 1;
+        out.push({fichier:f, vue:c.vue, qui:c.fQui, ou:c.fOu});
+      });
+    });
+  });
+  out.push({fichier:"vide.ics", vue:"evenements", qui:["À définir"], ou:[]});
+  return out;
+}
+
 function lireChemin(chemin){
   const bouts = String(chemin || "").split("/").filter(function(x){ return x !== ""; });
   if(!bouts.length) return {trouve:false, vue:"evenements", fQui:[], fOu:[]};
@@ -780,7 +860,7 @@ const F_QUI_LAB = {"Raph":"Raph","Marie":"Marie","Tous les 3":"Tous les 3",
 const F_OU  = ["Paris","Corenc","Autres",NONDEF];
 
 const STATE = {today:"", periode:"we-vac", qui:new Set(), ou:new Set(),
-               modele:null, premierRendu:true};
+               modele:null, calDispo:undefined, calVersion:null, premierRendu:true};
 
 /* La barre « Périodes » nomme la vue par défaut « we-vac » ; le script, lui,
    l'appelle « evenements ». Une seule fonction pour traduire. */
@@ -821,58 +901,28 @@ function bandeau(texte){
 /* ==================================================================
    3 ter. ABONNEMENT — un calendrier qui se met à jour tout seul
    ------------------------------------------------------------------
-   Un export est une photo ; un abonnement est un fil. Le lien pointe sur
-   l'application web du tableur, avec les filtres courants inscrits dedans.
-   Il ne bouge plus ensuite : c'est ce qui évite les doublons, puisqu'il
-   n'y a jamais de raison de se réabonner — mais changer de filtres
-   suppose donc de supprimer le calendrier et d'en ajouter un autre.
+   Les calendriers ne sont pas fabriqués par cette page ni servis par
+   Google : ce sont des fichiers .ics déposés à côté d'elle, dans le
+   dossier « cal/ », que le tableur republie tout seul.
+
+   Pourquoi ce détour : le Calendrier d'Apple n'accepte qu'une adresse
+   nue. Dès qu'elle porte un « ? » ou un segment de chemin, l'abonnement
+   échoue — vérifié deux fois, avec deux messages d'erreur différents.
+   Des fichiers statiques ont des adresses nues et ne redirigent pas.
+
+   Conséquence assumée : la liste des abonnements est FIXE, décidée dans
+   le script du tableur, et non fabriquée à partir des filtres. Les
+   filtres restent libres sur la page ; seul l'abonnement se choisit
+   dans une liste.
    ================================================================== */
+/* Vide = les .ics sont à la racine, à côté de cette page. Doit correspondre à
+   DOSSIER dans Code.gs. */
+/* Dossier des .ics, relatif à cette page. Doit correspondre à DOSSIER dans Code.gs. */
+const DOSSIER_CAL = "cal/";
 const MEMO_ABO = "anna-abos";
 
-/* Les filtres vont dans le chemin, pas dans une chaîne de requête : le
-   Calendrier d'Apple refuse en « erreur 400 » les adresses portant un « ? ».
-   Voir cheminAbo() dans le bloc partagé. */
-function adresseAbo(){
-  const base = adresseScript().replace(/\/+$/, "");
-  return base + cheminAbo(vueCourante(), [...STATE.qui], [...STATE.ou]);
-}
-/* Pas de webcal:// ici, et c'est un choix, pas un oubli : le Calendrier d'Apple
-   traduit webcal:// par http:// — pas https — et Google refuse le http. L'essai
-   se solde par « Connexion non sécurisée » puis « Échec de la validation ». On
-   donne donc l'adresse https à copier, ce que tous les agendas acceptent. */
-
-function memoAbos(){
-  try{ return JSON.parse(localStorage.getItem(MEMO_ABO) || "[]"); }catch(e){ return []; }
-}
-function noterAbo(nom, url){
-  const l = memoAbos().filter(x=> x.url !== url);
-  l.unshift({nom, url, le: new Date().toISOString()});
-  try{ localStorage.setItem(MEMO_ABO, JSON.stringify(l.slice(0,6))); }catch(e){}
-}
-
-/* Ce que l'abonné verra, en toutes lettres. Le but est qu'il ne découvre pas
-   après coup que son calendrier ne montre qu'une partie du planning. */
-/* Les intitulés des filtres sont faits pour des boutons, pas pour une phrase :
-   « avec Autres » ou « à Paris ou Corenc » se lisent mal. On les retraduit. */
-const DIT_QUI = {"Autres":"quelqu'un d'autre", "À définir":"une personne encore à définir"};
-const DIT_OU  = {"Paris":"à Paris", "Corenc":"à Corenc",
-                 "Autres":"ailleurs", "À définir":"dans un lieu encore à définir"};
-function resumeAbo(){
-  const vue = vueCourante();
-  const quoi = vue === "trajets" ? "les trajets"
-             : vue === "tout"    ? "tout le planning, semaines d'école comprises"
-             :                     "les week-ends et les vacances";
-  const f = [];
-  if(STATE.qui.size)
-    f.push("avec " + [...STATE.qui].map(q=> DIT_QUI[q] || q).join(" ou "));
-  if(STATE.ou.size)
-    f.push([...STATE.ou].map(o=> DIT_OU[o] || "à " + o).join(" ou "));
-  return quoi + (f.length ? " " + f.join(", ") : "");
-}
-
 /* La marche à suivre dépend de l'agenda, et aucun ne se ressemble. On montre
-   celle de l'appareil, les autres restent dépliables — un iPhone qui utilise
-   Google Agenda n'est pas un cas rare. */
+   celle de l'appareil, les autres restent à un clic. */
 const MODES = [
   {id:"ios",  lab:"iPhone ou iPad", pas:[
     "Ouvrez l'application <b>Calendrier</b>.",
@@ -904,26 +954,60 @@ function modeProbable(){
   return "goog";
 }
 
-async function versionDuScript(){
-  try{
-    const u = adresseScript();
-    const r = await fetch(u + (u.includes("?") ? "&" : "?") + "v=1",
-                          {redirect:"follow"});
-    return (await r.text()).trim();
-  }catch(e){ return null; }
+/* ------------------------------------------------------------------
+   L'adresse d'abonnement se déduit des filtres cochés, et de rien
+   d'autre : nomFichier() est dans le bloc partagé, donc la page et le
+   tableur calculent le même nom. L'abonné n'a rien à choisir, et
+   n'apprend jamais que les fichiers sont fixes.
+   ------------------------------------------------------------------ */
+function adresseAbo(){
+  return new URL(DOSSIER_CAL + nomFichier(vueCourante(), [...STATE.qui], [...STATE.ou]),
+                 location.href).href;
 }
+
+async function listeCalendriers(){
+  const r = await fetch(new URL(DOSSIER_CAL + "index.json", location.href).href,
+                        {cache:"no-store"});
+  if(!r.ok) throw new Error("index absent");
+  return await r.json();
+}
+
+function memoAbos(){
+  try{ return JSON.parse(localStorage.getItem(MEMO_ABO) || "[]"); }catch(e){ return []; }
+}
+function noterAbo(nom){
+  const l = memoAbos().filter(x=> x.nom !== nom);
+  l.unshift({nom, le:new Date().toISOString()});
+  try{ localStorage.setItem(MEMO_ABO, JSON.stringify(l.slice(0,6))); }catch(e){}
+}
+
+/* Ce que l'abonné verra, en toutes lettres. */
+function resumeAbo(){
+  const vue = vueCourante();
+  const quoi = vue === "trajets" ? "les trajets"
+             : vue === "tout"    ? "tout le planning, semaines d'école comprises"
+             :                     "les week-ends et les vacances";
+  const f = [];
+  if(STATE.qui.size)
+    f.push("avec " + [...STATE.qui].map(q=> DIT_QUI[q] || q).join(" ou "));
+  if(STATE.ou.size)
+    f.push([...STATE.ou].map(o=> DIT_OU[o] || "à " + o).join(" ou "));
+  return quoi + (f.length ? " " + f.join(", ") : "");
+}
+const DIT_QUI = {"Autres":"quelqu'un d'autre", "À définir":"une personne encore à définir"};
+const DIT_OU  = {"Paris":"à Paris", "Corenc":"à Corenc",
+                 "Autres":"ailleurs", "À définir":"dans un lieu encore à définir"};
 
 function fermerAbo(){ document.querySelector(".voile")?.remove(); }
 
 async function ouvrirAbo(){
   const vue = vueCourante(), fQui = [...STATE.qui], fOu = [...STATE.ou];
   const url = adresseAbo(), nom = nomCalendrier(vue, fQui, fOu);
-  // Le compte annoncé doit être celui de l'abonnement, pas celui de l'écran :
-  // la recherche filtre la liste affichée mais n'entre pas dans le lien.
+  // Le compte annoncé est celui de l'abonnement, pas celui de l'écran : la
+  // recherche filtre la liste affichée mais n'entre pas dans le calendrier.
   const n = pourCalendrier(STATE.modele, vue, fQui, fOu).length;
   const q = requete();
-  const deja = memoAbos();
-  const mode = modeProbable();
+  const mode = modeProbable(), deja = memoAbos();
 
   const onglets = MODES.map(m =>
     `<button type="button" class="ong${m.id===mode?" on":""}" data-m="${m.id}">${m.lab}</button>`
@@ -944,8 +1028,9 @@ async function ouvrirAbo(){
       ajoutés (ceux pour lesquels la personne et le lieu sont renseignés).<br><br>
       Votre calendrier se mettra ensuite à jour tout seul, au fur et à mesure que Marie et Raph
       renseignent le tableur : les évènements modifiés le seront chez vous, et les nouveaux
-      s'ajouteront. Comptez un délai — chaque appareil rafraîchit ses abonnements à son propre
-      rythme, souvent une fois par jour.</p>
+      s'ajouteront. Comptez un délai — le planning est republié toutes les trois heures, et
+      chaque appareil rafraîchit ses abonnements à son propre rythme, souvent une fois par
+      jour.</p>
 
     ${q ? `<p class="avert">Votre recherche « ${esc(q)} » n'est pas reprise : un abonnement
       ne retient que les filtres.</p>` : ""}
@@ -973,7 +1058,6 @@ async function ouvrirAbo(){
   document.body.appendChild(v);
   v.addEventListener("click", e=>{ if(e.target === v) fermerAbo(); });
   document.getElementById("abo-x").addEventListener("click", fermerAbo);
-
   for(const b of v.querySelectorAll(".ong")) b.addEventListener("click", ()=>{
     for(const x of v.querySelectorAll(".ong")) x.classList.toggle("on", x === b);
     for(const o of v.querySelectorAll(".pas")) o.hidden = o.dataset.m !== b.dataset.m;
@@ -982,31 +1066,24 @@ async function ouvrirAbo(){
   const champ = document.getElementById("abo-u");
   champ.addEventListener("focus", ()=> champ.select());
   document.getElementById("abo-cp").addEventListener("click", async ()=>{
-    noterAbo(nom, url);
+    noterAbo(nom);
     try{
       await navigator.clipboard.writeText(url);
       bandeau("Adresse copiée. Collez-la dans votre calendrier en suivant les étapes ci-dessus.");
     }catch(e){
-      // Sur certains navigateurs le presse-papier est refusé : on sélectionne le
-      // texte pour que la copie manuelle demande un geste de moins.
       champ.focus(); champ.select();
-      bandeau("Copie automatique refusée par le navigateur. L'adresse est sélectionnée : "
-            + "copiez-la à la main.");
+      bandeau("Copie refusée par le navigateur. L'adresse est sélectionnée : copiez-la à la main.");
     }
   });
 
-  // Quand tout va bien, on ne dit rien : c'est le cas normal, et l'utilisateur n'a
-  // pas à connaître l'existence d'un numéro de version. On ne parle qu'en cas d'ennui,
-  // et pour lui donner la seule action utile de son point de vue : prévenir Raph.
-  const vs = await versionDuScript();
+  // Le tableur et la page doivent porter la même logique, sinon le calendrier et
+  // l'écran ne disent pas la même chose. On ne parle qu'en cas d'écart.
   const el = document.getElementById("abo-v");
-  if(!el || vs === VERSION) return;
-  el.hidden = false;
-  el.textContent = vs === null
-    ? "Le planning ne répond pas en ce moment. Vous pouvez essayer quand même, mais si "
-      + "l'abonnement ne fonctionne pas, prévenez Raph : il y a un problème à corriger."
-    : "Attention : ce calendrier risque de ne pas être à jour. Prévenez Raph avant de vous "
-      + "y abonner, il y a un problème à corriger.";
+  if(el && STATE.calVersion && STATE.calVersion !== VERSION){
+    el.hidden = false;
+    el.textContent = "Attention : ce calendrier risque de ne pas être à jour. "
+      + "Prévenez Raph avant de vous y abonner, il y a un problème à corriger.";
+  }
 }
 
 /* ==================================================================
@@ -1093,8 +1170,10 @@ function majExport(n, total, trajets){
   const b = document.getElementById("abo"), note = document.getElementById("expnote");
   if(!b) return;
   const nom = (k) => trajets ? (k>1?"trajets":"trajet") : (k>1?"périodes":"période");
-  b.hidden = !n;
-  if(n) b.innerHTML = ICONE_CAL + `<span>S'abonner à cette vue</span>`;
+  // Pas de bouton tant qu'on ne sait pas si des calendriers ont été publiés :
+  // mieux vaut ne rien proposer qu'un bouton qui s'excuse.
+  b.hidden = !n || !STATE.calDispo;
+  if(n) b.innerHTML = ICONE_CAL + `<span>S'abonner au calendrier</span>`;
   const reste = total - n;
   note.hidden = !reste;
   if(reste) note.textContent = `${reste} ${nom(reste)} encore à définir ${
@@ -1204,10 +1283,17 @@ function rendre(days){
   STATE.jours = days;
   STATE.modele  = modele(days);
   STATE.parDate = STATE.modele.parDate;
+  // Les calendriers publiés sont-ils là ? Une seule requête, à côté de la page.
+  if(STATE.calDispo === undefined){
+    STATE.calDispo = false;
+    listeCalendriers().then(ix=>{
+      STATE.calDispo = true; STATE.calVersion = ix.version; renderList();
+    }).catch(()=>{});
+  }
 
   document.getElementById("app").innerHTML = carteNow() + barreHTML() +
-    (adresseScript() ? `<div class="expbar"><button id="abo" type="button" hidden></button>` +
-      `<p id="expnote" hidden></p></div>` : "") +
+    `<div class="expbar"><button id="abo" type="button" hidden></button>` +
+    `<p id="expnote" hidden></p></div>` +
     `<div id="results"></div>`;
   initTools();
   renderList();
@@ -1262,14 +1348,10 @@ async function deriver(reponse, sel, iter){
   return crypto.subtle.deriveKey({name:"PBKDF2", salt:sel, iterations:iter, hash:"SHA-256"},
                                  base, {name:"AES-GCM", length:256}, true, ["encrypt","decrypt"]);
 }
-/* Le coffre contient l'adresse du tableur et, éventuellement, celle du script,
-   séparées par un saut de ligne. Un coffre d'avant cette version ne contient que
-   la première : il continue de s'ouvrir sans rien changer. */
-function repartir(clair){
-  const [csv, script] = String(clair).split("\n");
-  SCRIPT_DECHIFFRE = (script || "").trim();
-  return (csv || "").trim();
-}
+/* Un coffre a pu contenir deux adresses, séparées par un saut de ligne, du temps
+   où la page interrogeait aussi le script du tableur. On ne garde que la première :
+   les anciens coffres continuent donc de s'ouvrir. */
+function repartir(clair){ return String(clair).split("\n")[0].trim(); }
 
 async function ouvrir(coffre, cle){
   const p = partsCoffre(coffre);
