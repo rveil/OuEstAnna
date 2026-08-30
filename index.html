@@ -298,7 +298,7 @@ function adresseScript(){ return P.get("script") || SCRIPT_DECHIFFRE || SCRIPT_U
    Ces lignes se fabriquent avec « Reglages.html », qui régénère un index.html
    complet — à garder sur votre ordinateur (ne pas le déposer sur GitHub).
    ------------------------------------------------------------------ */
-const COFFRE = "v2.300000.kwx4esZ5HweFQ5S18141JA==.6+baKaIiB02QU5vz.6auhsYSQnrnjlh7Bm4QtMLJlspn1OrjL2a5fKxyBBkDDv3GFTu55G8r0eZK5f8uVO3aiasKokJKOyRMkzxuEGNCySzIejw54NLhY4kYwDZUs1aFBVUk806YCBZcPgVa+mUUPrZSzkDxDiwARzxfwo2C11GaKonA4kkr7i9r4PNzk6JPZ4bO+ffXpdrg0qMHJUL+a159/nd/5lrHr5nrwkSQ4ICl7u5HNNnXp7ZsFIT9m4aJW4pztjpUFeLcnEZNLOUSibJMuXYid0gkl1uAU70oc5PaCQ011+hiNZAnvlE96xqy5RZfDBP/YjjS64tDkUdI1xxllQIByn++YQHPOSRW+kpHio05KX6Hh9RnEopNAHzRiWP/VUbtSb2gn2WmfMtiV/9hBaBwDcw==";
+const COFFRE = "v2.300000.6mZ9NeOpozUnRzVzbYKtyg==.9adoNn9QpIQBZcED.oiLrQp434UIhtdIHUunRZyjAOOtts0EtQO+dHHHy/o2MAVmaY/uMzBdlH0MkbBNr9NiKlpqlmnjAR92JgQA52m4/ZB3pfkiZ5i9ODqbyc06dHJCGv3zo/L44ZOC6RfQ2KePsfTPngpf94acq3od0NQLVyoBpfumtO2leMQFHy/VJcxtDO2JXbNW09F4cjSKAC8h/rk2g3P37G7TiqZfwjyvI9ZOwEMOZJaOa1RYba1W9pHNHedhJCH5vpUgXSVgV+2jyQ5HH6ntbZn7EVvPxiAxuG/1oe7qdmcjV5TCl5hWJy4zJfERX/JGYKKn7pRtdPuyqqeha4HjcjCj0YU/geWo44PbIb4dQd8Astnoj54iHWv90XK4OnxYbqS5gKYmj8fNCgCc3GJz9wg==";
 const QUESTION = "Quelle est sa couleur préférée ?";
 
 /* ------------------------------------------------------------------ */
@@ -306,7 +306,7 @@ const P = new URLSearchParams(location.search);
 
 /* >>> LOGIQUE PARTAGÉE — engendré, ne pas modifier ici <<< */
 /* ==================================================================
-   LOGIQUE PARTAGÉE — version 3.2
+   LOGIQUE PARTAGÉE — version 3.3
    ------------------------------------------------------------------
    Ce bloc est IDENTIQUE, au caractère près, dans Pre-index.html et dans
    Code.gs. Il est engendré par build_logique.py à partir de
@@ -318,7 +318,7 @@ const P = new URLSearchParams(location.search);
    (?v=1) et vérifié par la page au moment de l'abonnement : si les
    deux ne correspondent pas, la page le dit.
    ================================================================== */
-const VERSION = "3.2";
+const VERSION = "3.3";
 
 const JOURS = {lun:"lundi",mar:"mardi",mer:"mercredi",jeu:"jeudi",ven:"vendredi",sam:"samedi",dim:"dimanche"};
 const MOIS = ["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
@@ -704,6 +704,43 @@ function filtrer(liste, trajets, fQui, fOu){
   return liste.filter(x=> passeQuiOu(trajets ? x.quis : [x.qui],
                                      trajets ? x.ous  : [x.ou], fQui, fOu));
 }
+/* ------------------------------------------------------------------
+   L'adresse d'abonnement passe par le CHEMIN, pas par la requête.
+   ------------------------------------------------------------------
+   « …/exec » s'ajoute sans problème au Calendrier d'Apple, mais
+   « …/exec?c=trajets&qui=Raph » échoue avec « erreur 400 ». Apps Script
+   répond à /exec par une redirection vers script.googleusercontent.com ;
+   dès qu'il y a une chaîne de requête, le suivi de cette redirection par
+   le Calendrier produit une adresse que Google refuse.
+
+   On encode donc les filtres dans le chemin — « …/exec/j/r/p » — en
+   lettres ASCII, sans « ? », sans « & », sans « = » et sans accent.
+   Le script accepte encore les paramètres classiques, commodes pour un
+   essai depuis un navigateur.
+   ------------------------------------------------------------------ */
+const CODE_VUE = {"evenements":"e", "tout":"t", "trajets":"j"};
+const CODE_QUI = {"Raph":"r", "Marie":"m", "Tous les 3":"3", "Autres":"a", "À définir":"d"};
+const CODE_OU  = {"Paris":"p", "Corenc":"c", "Autres":"a", "À définir":"d"};
+function inverse(t){ const r = {}; for(const k in t) r[t[k]] = k; return r; }
+const VUE_CODE = inverse(CODE_VUE), QUI_CODE = inverse(CODE_QUI), OU_CODE = inverse(CODE_OU);
+
+function cheminAbo(vue, fQui, fOu){
+  const lettres = (l, t) => (l || []).map(x=> t[x] || "").join("");
+  const q = lettres(fQui, CODE_QUI), o = lettres(fOu, CODE_OU);
+  let c = "/" + (CODE_VUE[vue] || "e");
+  if(q || o) c += "/" + (q || "-");
+  if(o)      c += "/" + o;
+  return c;
+}
+function lireChemin(chemin){
+  const bouts = String(chemin || "").split("/").filter(function(x){ return x !== ""; });
+  if(!bouts.length) return {trouve:false, vue:"evenements", fQui:[], fOu:[]};
+  const dec = (s, t) => (s && s !== "-")
+    ? String(s).split("").map(function(c){ return t[c]; }).filter(Boolean) : [];
+  return {trouve:true, vue: VUE_CODE[bouts[0]] || "evenements",
+          fQui: dec(bouts[1], QUI_CODE), fOu: dec(bouts[2], OU_CODE)};
+}
+
 /* Le nom du calendrier porte ses filtres : un abonnement oublié reste
    identifiable d'un coup d'œil dans la liste des calendriers. */
 function nomCalendrier(vue, fQui, fOu){
@@ -792,12 +829,12 @@ function bandeau(texte){
    ================================================================== */
 const MEMO_ABO = "anna-abos";
 
+/* Les filtres vont dans le chemin, pas dans une chaîne de requête : le
+   Calendrier d'Apple refuse en « erreur 400 » les adresses portant un « ? ».
+   Voir cheminAbo() dans le bloc partagé. */
 function adresseAbo(){
-  const base = adresseScript();
-  const par = new URLSearchParams({c: vueCourante()});
-  if(STATE.qui.size) par.set("qui", [...STATE.qui].join(","));
-  if(STATE.ou.size)  par.set("ou",  [...STATE.ou].join(","));
-  return base + (base.includes("?") ? "&" : "?") + par.toString();
+  const base = adresseScript().replace(/\/+$/, "");
+  return base + cheminAbo(vueCourante(), [...STATE.qui], [...STATE.ou]);
 }
 /* Pas de webcal:// ici, et c'est un choix, pas un oubli : le Calendrier d'Apple
    traduit webcal:// par http:// — pas https — et Google refuse le http. L'essai
