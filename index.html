@@ -128,6 +128,17 @@ h2{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink
   background:var(--cb,var(--def-bg));color:var(--c,var(--def));
 }
 .tag.jour{background:var(--ink);color:var(--bg)}
+/* Ajouter un évènement seul, depuis sa vignette. Grisé — et non caché — quand la
+   personne ou le lieu reste à définir : un bouton absent se lit comme un oubli,
+   un bouton grisé se lit comme une raison. */
+.row .add{flex:0 0 auto;align-self:center;font:inherit;padding:.34rem;border-radius:9px;
+  cursor:pointer;background:transparent;border:1px solid var(--line);color:var(--ink-3);
+  display:flex;align-items:center;justify-content:center}
+.row .add svg{width:1rem;height:1rem;stroke:currentColor;fill:none;stroke-width:1.9;
+  stroke-linecap:round}
+.row .add:hover:not(:disabled),.row .add:active:not(:disabled){
+  background:var(--line-2);color:var(--ink);border-color:var(--ink-3)}
+.row .add[aria-disabled="true"]{opacity:.3;cursor:not-allowed}
 .m-marie{--c:var(--marie);--cb:var(--marie-bg)}
 .m-raph{--c:var(--raph);--cb:var(--raph-bg)}
 .m-tous{--c:var(--tous);--cb:var(--tous-bg)}
@@ -177,6 +188,11 @@ h2{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink
 .abo .etapes summary::before{content:"▸ ";font-size:.9em}
 .abo .etapes[open] summary::before{content:"▾ "}
 .abo .etapes[open] summary{margin-bottom:.6rem}
+/* Même cadre que le repli de l'abonnement, mais toujours ouvert : ici, la marche
+   à suivre n'est pas un secours, c'est le contenu de la fenêtre. */
+.abo .etapes.ouvert{padding:.75rem}
+.abo .etapes + .avert{margin-top:.9rem}
+.abo .titre-etapes{margin:0 0 .6rem;font-size:.75rem;font-weight:600;color:var(--ink-3)}
 .abo .ongs{display:flex;flex-wrap:wrap;gap:.3rem;margin-bottom:.6rem}
 .abo .ong{font:inherit;font-size:.72rem;font-weight:600;padding:.28rem .55rem;border-radius:999px;
   cursor:pointer;background:transparent;border:1px solid var(--line);color:var(--ink-3)}
@@ -184,9 +200,16 @@ h2{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink
 .abo ol.pas{margin:0;padding-left:1.15rem;font-size:.78rem;line-height:1.5;color:var(--ink-2)}
 .abo ol.pas li{margin:.28rem 0}
 .abo ol.pas[hidden]{display:none}
-.abo #abo-u{width:100%;box-sizing:border-box;margin-top:.7rem;font-family:ui-monospace,
+/* L'adresse et sa copie vont ensemble : le bouton n'a de sens qu'à côté du champ
+   qu'il copie, et n'a rien à faire dans la rangée principale. */
+.abo .ligne-u{display:flex;gap:.4rem;align-items:stretch;margin-top:.7rem}
+.abo #abo-u{flex:1;min-width:0;box-sizing:border-box;font-family:ui-monospace,
   SFMono-Regular,Menlo,monospace;font-size:.7rem;padding:.45rem .5rem;border-radius:8px;
   border:1px solid var(--line);background:var(--line-2);color:var(--ink-2)}
+.abo #abo-cp{flex:0 0 auto;font:inherit;font-size:.75rem;font-weight:600;padding:.4rem .7rem;
+  border-radius:8px;cursor:pointer;border:1px solid var(--line);background:transparent;
+  color:var(--ink-2)}
+.abo #abo-cp:hover{border-color:var(--ink-3);color:var(--ink)}
 .abo .deja{font-size:.75rem;color:var(--ink-3);border-top:1px solid var(--line);
   margin-top:.9rem;padding-top:.7rem}
 .abo .deja b{display:block;color:var(--ink-2);font-weight:600;margin-bottom:.25rem}
@@ -299,7 +322,7 @@ const SHEET_GID = "1504266455";
    Ces lignes se fabriquent avec « Reglages.html », qui régénère un index.html
    complet — à garder sur votre ordinateur (ne pas le déposer sur GitHub).
    ------------------------------------------------------------------ */
-const COFFRE = "v2.300000.UnFuEfCPDh0Cgm1l09z0Vw==.KTHSMrX/HwkYt7e9.CGKEu9b0lQ53sVN9AtUJXEoJGM9LRm4NFGPwfmL7ujvhf6NyM51HxZ5qp6cgZUKtFQA6zUMh8uaPL4Q/cyb6xoc/6XrlUdaOJXgSVkw68VDmuMvphExORYO4h5XqdJttcMRnoeSYshBdOptaGo/rGtGJ0e6GU6dNenNEsgDNCUKCJrICs2x41qbXvKfqKiKstEucBIjQy3lQ58Dnarr1i9o/1bzd40HE2X96arYCcNLax/EIYaR4C4Y=";
+const COFFRE = "v2.300000.TJM4t14VNxD4fuWEh7qvVA==.rfY03dgj64s9Rlt9.bMU+kTFSuytL09nr5Of6Eu7A3bKyHN3k1YawiJupn1deTurYfPNS+IYGMp6xi7uz6n92AtfxcrvtTe5EvU+ITfYNlzRxWBglXgwJ2hoX6zs1pt1hF54Q+X1JxA9NLB0QIZoLLuoa69eAfwZrRBBPm288ty+8ikYzdJwcGDyOr+CYyVEWv/tIm1zPD9PXv2dZCq6F+T/erzkuSGBqDN4E6iKQjSGgT+cYOVQBFW/YXTqCnbCbAsdFRZs=";
 const QUESTION = "Quelle est sa couleur préférée ?";
 
 /* ------------------------------------------------------------------ */
@@ -621,13 +644,28 @@ function notesDatees(jours){
     : `Du ${libelleDate(p.debut)} au ${libelleDate(p.fin)} : ${p.com}`);
 }
 
+/* Titre, dates, lieu et note d'un élément : le seul endroit où l'on décide de
+   quoi est fait un évènement. Le .ics le traverse, et la page aussi quand elle
+   propose d'ajouter l'évènement autrement qu'en fichier — sans quoi les deux
+   finiraient par ne plus raconter la même chose. */
+function champsEvenement(x, trajets, parDate){
+  if(trajets){
+    // le titre dit déjà avec qui : la note ne le répète que s'il y a passation
+    const lignes = [x.sens + (x.passation ? " · " + x.brute : "")];
+    if(x.date2) lignes.push(`Départ possible le ${libelleDate(x.date)} ou le ${libelleDate(x.date2)}.`);
+    lignes.push(...notesTrajet(x, parDate));
+    return {debut:x.date, fin:x.date2 || x.date,
+            lieu:"",                 // un trajet n'a pas de lieu : il en relie deux
+            titre:titreTrajet(x), note:lignes.filter(Boolean).join("\n"),
+            cle:`t-${x.date}-${x.sens}-${x.de}-${x.vers}`};
+  }
+  return {debut:x.debut, fin:x.fin, lieu:lieuEvenement(x.ou),
+          titre:titrePeriode(x), note:notesDatees(x.jours).join("\n"),
+          cle:`p-${x.debut}-${x.fin}-${x.qui}-${x.ou}`};
+}
+
 function evenementBloc(b){
-  return evenement({
-    debut:b.debut, fin:b.fin,
-    lieu: lieuEvenement(b.ou),
-    titre: titrePeriode(b),
-    note: notesDatees(b.jours).join("\n"),
-    cle:`p-${b.debut}-${b.fin}-${b.qui}-${b.ou}`});
+  return evenement(champsEvenement(b, false, null));
 }
 /* Sur un trajet, un commentaire n'a d'intérêt que s'il parle du jour du voyage.
    « Vacances de la Toussaint », qui court sur deux semaines, ne dit rien du trajet ;
@@ -656,16 +694,7 @@ function comTrajet(t, parDate){
 }
 
 function evenementTrajet(t, parDate){
-  // le titre dit déjà avec qui : la note ne le répète que s'il y a passation
-  const lignes = [t.sens + (t.passation ? " · " + t.brute : "")];
-  if(t.date2) lignes.push(`Départ possible le ${libelleDate(t.date)} ou le ${libelleDate(t.date2)}.`);
-  lignes.push(...notesTrajet(t, parDate));
-  return evenement({
-    debut:t.date, fin:t.date2 || t.date,
-    lieu: "",                    // un trajet n'a pas de lieu : il en relie deux
-    titre: titreTrajet(t),
-    note: lignes.filter(Boolean).join("\n"),
-    cle:`t-${t.date}-${t.sens}-${t.de}-${t.vers}`});
+  return evenement(champsEvenement(t, true, parDate));
 }
 
 function calendrier(elements, trajets, parDate, nomCal){
@@ -933,20 +962,38 @@ const MEMO_ABO = "anna-abos";
    Outlook n'a aucun raccourci. On devine l'agenda de l'appareil, on dit en une
    phrase ce que le bouton va faire, et on laisse changer d'avis — un iPhone
    peut très bien vivre sous Google Agenda.
-     agit : ce que fait le bouton  ·  dit : ce qu'on annonce  ·  pas : à la main */
+   Deux jeux de champs, parce que s'abonner à un calendrier et poser un évènement
+   isolé ne se font pas du tout de la même façon :
+     agit / dit / pas       — l'abonnement au calendrier ;
+     agitUn / ditUn / pasUn — l'ajout d'un seul évènement. */
 const MODES = [
   {id:"ios",  lab:"iPhone ou iPad", agit:"webcal",
+   agitUn:"fichier",
+   ditUn:"Le fichier de l'évènement va s'enregistrer dans vos téléchargements.", pasUn:[
+    "Touchez <b>Ajouter à mon agenda</b> : un fichier <b>.ics</b> s'enregistre.",
+    "Ouvrez-le — la flèche de téléchargement dans Safari, ou l'application <b>Fichiers</b> → <b>Téléchargements</b>.",
+    "Le Calendrier s'ouvre sur l'évènement : <b>Ajouter tout</b>, choisissez l'agenda, puis <b>Ajouter</b>."],
    dit:"L'application Calendrier va s'ouvrir et vous proposer l'abonnement.", pas:[
     "Ouvrez l'application <b>Calendrier</b>.",
     "Onglet <b>Calendriers</b>, en bas de l'écran.",
     "<b>Ajouter un calendrier</b> → <b>Ajouter un calendrier avec abonnement</b>.",
     "Collez l'adresse, puis <b>S'abonner</b>."]},
   {id:"mac",  lab:"Mac", agit:"webcal",
+   agitUn:"fichier",
+   ditUn:"Le fichier de l'évènement va se télécharger, et Calendrier saura l'ouvrir.", pasUn:[
+    "Cliquez sur <b>Ajouter à mon agenda</b> : un fichier <b>.ics</b> se télécharge.",
+    "Ouvrez-le (double-clic depuis les téléchargements) : <b>Calendrier</b> s'ouvre.",
+    "Choisissez l'agenda de destination, puis <b>OK</b>."],
    dit:"L'application Calendrier va s'ouvrir et vous proposer l'abonnement.", pas:[
     "Ouvrez l'application <b>Calendrier</b>.",
     "Menu <b>Fichier → Nouvel abonnement au calendrier</b>.",
     "Collez l'adresse, puis <b>S'abonner</b>."]},
   {id:"goog", lab:"Google Agenda", agit:"google",
+   agitUn:"google",
+   ditUn:"Google Agenda va s'ouvrir sur un évènement déjà rempli.", pasUn:[
+    "Touchez <b>Ajouter à mon agenda</b> : Google Agenda s'ouvre sur un nouvel évènement, déjà rempli.",
+    "Vérifiez, puis <b>Enregistrer</b>.",
+    "Rien n'est ajouté tant que vous n'avez pas enregistré."],
    dit:"Google Agenda va s'ouvrir dans un nouvel onglet et vous proposer l'ajout.", pas:[
     "Depuis un <b>ordinateur</b>, ouvrez <b>calendar.google.com</b>.",
     "À gauche, <b>Autres agendas</b> → le <b>+</b> → <b>À partir de l'URL</b>.",
@@ -954,6 +1001,11 @@ const MODES = [
     "L'application mobile ne sait pas le faire elle-même, mais l'agenda ajouté sur " +
       "l'ordinateur apparaît ensuite sur le téléphone."]},
   {id:"outl", lab:"Outlook", agit:"copier",
+   agitUn:"fichier",
+   ditUn:"Le fichier de l'évènement va se télécharger ; Outlook demande ensuite de le charger.", pasUn:[
+    "Cliquez sur <b>Ajouter à mon agenda</b> : un fichier <b>.ics</b> se télécharge.",
+    "Dans <b>Outlook</b>, ouvrez <b>Calendrier</b> → <b>Ajouter un calendrier</b>.",
+    "<b>Charger à partir d'un fichier</b>, choisissez le fichier téléchargé et l'agenda de destination."],
    dit:"Outlook n'a pas de raccourci : l'adresse sera copiée, et la marche à suivre "
      + "s'affichera juste en dessous.", pas:[
     "Ouvrez <b>Outlook</b> sur le web, puis <b>Calendrier</b>.",
@@ -992,6 +1044,17 @@ const enWebcal = u => u.replace(/^https?:\/\//, "webcal://");
 /* Google Agenda sait s'abonner en un clic, mais par une adresse à lui. */
 const versGoogleAgenda = u =>
   "https://calendar.google.com/calendar/r?cid=" + encodeURIComponent(u);
+/* Et pour un évènement seul, Google ouvre un formulaire pré-rempli : un clic au
+   lieu d'un fichier à télécharger puis à importer par un menu bien caché. Les
+   champs viennent de champsEvenement(), donc de la même source que le .ics. */
+function versGoogleEvenement(x, trajets){
+  const c = champsEvenement(x, trajets, STATE.parDate);
+  const p = new URLSearchParams({action:"TEMPLATE", text:c.titre,
+    dates: compact(c.debut) + "/" + compact(jourPlus(c.fin, 1))});
+  if(c.lieu) p.set("location", c.lieu);
+  if(c.note) p.set("details", c.note);
+  return "https://calendar.google.com/calendar/render?" + p;
+}
 
 async function listeCalendriers(){
   const r = await fetch(new URL(DOSSIER_CAL + "index.json", location.href).href,
@@ -1047,39 +1110,41 @@ async function ouvrirAbo(){
   const v = document.createElement("div");
   v.className = "voile";
   v.innerHTML = `<div class="abo" role="dialog" aria-modal="true" aria-label="S'abonner">
-    <h3>S'abonner à cette vue</h3>
+    <h3>S'abonner à ce calendrier</h3>
 
     <p class="quoi"><b>${esc(nom)}</b><br>
-      En vous abonnant à cette vue, vous ajouterez à votre calendrier ${esc(resumeAbo())}.
-      Compte tenu des filtres que vous avez sélectionnés, cet abonnement y ajoutera
-      <b>${n} ${n>1?"évènements":"évènement"}</b>. Seuls les évènements « complets » sont
+      L'abonnement vous permet d'ajouter ce calendrier à votre agenda personnel, directement sur
+      votre appareil, en tenant compte des filtres que vous avez sélectionnés. En cliquant sur
+      « S'abonner », vous ajouterez à votre agenda ${esc(resumeAbo())}
+      (<b>${n} ${n>1?"évènements":"évènement"}</b>). Seuls les évènements « complets » seront
       ajoutés (ceux pour lesquels la personne et le lieu sont renseignés).<br><br>
-      Votre calendrier se mettra ensuite à jour tout seul, au fur et à mesure que Marie et Raph
-      renseignent le tableur : les évènements modifiés le seront chez vous, et les nouveaux
-      s'ajouteront. Comptez un délai — le planning est republié toutes les trois heures, et
-      chaque appareil rafraîchit ses abonnements à son propre rythme, souvent une fois par
-      jour.</p>
+      Ce calendrier sera alors automatiquement mis à jour, au fur et à mesure que Marie et Raph
+      rempliront le tableau de planning d'Anna (modifications, ajouts, etc.). Attention, il peut y
+      avoir un certain délai de mise à jour sur votre agenda (jusqu'à 24 h environ, selon votre
+      appareil).</p>
 
-    ${q ? `<p class="avert">Votre recherche « ${esc(q)} » n'est pas reprise : un abonnement
+    ${q ? `<p class="avert">Votre recherche « ${esc(q)} » n'est pas reprise : un abonnement
       ne retient que les filtres.</p>` : ""}
     <p class="avert">Les filtres que vous avez sélectionnés s'appliquent à cet abonnement. Si vous
       souhaitez plus tard vous abonner avec d'autres filtres, supprimez d'abord l'abonnement en
-      cours dans votre calendrier, puis abonnez-vous à nouveau — sans quoi vous verriez les
+      cours dans votre calendrier, puis abonnez-vous à nouveau — sans quoi vous verriez certains
       évènements en double.</p>
     <p class="alerte" id="abo-v" hidden></p>
 
     <div class="actions">
       <button type="button" class="fort" id="abo-go">S'abonner</button>
-      <button type="button" id="abo-cp">Copier l'adresse</button>
     </div>
     <p class="dit"><span id="abo-dit"></span>
       <button type="button" class="lien" id="abo-autre">Ce n'est pas mon agenda</button></p>
 
     <details class="etapes">
-      <summary>Si rien ne se passe, ou pour un autre agenda</summary>
+      <summary>Si rien ne se passe, pour un autre agenda, ou pour copier l'adresse</summary>
       <div class="ongs">${onglets}</div>
       ${modes}
-      <input id="abo-u" readonly value="${esc(url)}">
+      <div class="ligne-u">
+        <input id="abo-u" readonly value="${esc(url)}">
+        <button type="button" id="abo-cp">Copier</button>
+      </div>
     </details>
 
     <div class="actions"><button type="button" id="abo-x">Fermer</button></div>
@@ -1131,7 +1196,7 @@ async function ouvrirAbo(){
       a.href = enWebcal(url);
       document.body.appendChild(a); a.click(); a.remove();
       bandeau(`Votre calendrier devrait s'ouvrir et proposer l'abonnement. S'il ne se passe
-        rien, dépliez « Si rien ne se passe » et copiez l'adresse.`);
+        rien, dépliez « Si rien ne se passe » et copiez l'adresse.`);
     }else if(agit === "google"){
       window.open(versGoogleAgenda(url), "_blank", "noopener");
       bandeau(`Google Agenda s'ouvre dans un autre onglet. S'il ne s'ouvre pas, votre
@@ -1143,7 +1208,7 @@ async function ouvrirAbo(){
   });
   document.getElementById("abo-cp").addEventListener("click", ()=>{
     noterAbo(nom);
-    copier("Adresse copiée. Dépliez « Si rien ne se passe » pour la marche à suivre.");
+    copier("Adresse copiée. Suivez la marche à suivre ci-dessus.");
   });
 
   // Le tableur et la page doivent porter la même logique, sinon le calendrier et
@@ -1159,7 +1224,31 @@ async function ouvrirAbo(){
 /* ==================================================================
    4. RENDU
    ================================================================== */
-function ligneBloc(b){
+/* ------------------------------------------------------------------
+   Ajouter un évènement seul. L'abonnement reste la bonne voie — il suit
+   le tableur, un fichier non — mais on ne s'abonne pas pour un week-end
+   isolé qu'on veut juste poser dans son agenda.
+   Le bouton est *grisé* quand la personne ou le lieu reste à définir, et
+   pourtant il répond encore : sur un téléphone, rien ne survole, et un
+   bouton mort sans explication est une petite énigme. Il dit pourquoi.
+   ------------------------------------------------------------------ */
+function boutonAjout(x, trajets, i){
+  const ok = exportable(x, trajets);
+  const quoi = trajets ? "ce trajet" : "cette période";
+  const dit = ok ? "Ajouter " + quoi + " à mon agenda" : POURQUOI_PAS(x, trajets);
+  return `<button type="button" class="add" data-i="${i}"${ok?"":' aria-disabled="true"'}
+    title="${esc(dit)}" aria-label="${esc(dit)}">${ICONE_CAL}</button>`;
+}
+function POURQUOI_PAS(x, trajets){
+  const manque = trajets
+    ? [!defini(x.de) && "le lieu de départ", !defini(x.vers) && "le lieu d'arrivée",
+       !x.quis.every(defini) && "la personne accompagnante"].filter(Boolean)
+    : [!defini(x.qui) && "la personne", !defini(x.ou) && "le lieu"].filter(Boolean);
+  return "Impossible d'ajouter l'évènement : " + manque.join(" et ")
+       + (manque.length > 1 ? " restent à définir." : " reste à définir.");
+}
+
+function ligneBloc(b, i){
   const cl = classeQui(b.qui);
   const ici = b.debut<=STATE.today && STATE.today<=b.fin;
   const passe = b.fin < STATE.today ? " past" : "";
@@ -1175,11 +1264,11 @@ function ligneBloc(b){
       <p class="when">${esc(libellePeriode(b))}</p>
       <p class="who">${esc(LIBELLE[b.qui]||b.qui)}${lieu}</p>
       ${b.com?`<p class="note">${esc(b.com)}</p>`:""}
-    </div>${tag}
+    </div>${tag}${boutonAjout(b, false, i)}
   </div>`;
 }
 
-function ligneTrajet(t){
+function ligneTrajet(t, i){
   const cl = t.couleur || classeQui(t.quis[t.quis.length-1]);
   const finT = t.date2 || t.date;
   const ici = t.date===STATE.today || finT===STATE.today;
@@ -1198,7 +1287,7 @@ function ligneTrajet(t){
       <p class="when">${quand}</p>
       <p class="who">${nom(t.de)} <span class="fleche">→</span> ${nom(t.vers)}</p>
       <p class="note">${t.note}${com ? " · " + esc(com) : ""}</p>
-    </div><span class="tag">${esc(t.sens)}</span>
+    </div><span class="tag">${esc(t.sens)}</span>${boutonAjout(t, true, i)}
   </div>`;
 }
 
@@ -1210,11 +1299,13 @@ function parMois(items, dateDe, rendu){
     if(!m.has(k)) m.set(k,[]);
     m.get(k).push(it);
   }
-  let out="";
+  // Le rang est celui de la liste entière, pas du mois : c'est lui qui relie la
+  // vignette à son élément dans STATE.affiches quand on clique sur « ajouter ».
+  let out="", rang=0;
   for(const [k,list] of m){
     const [y,mo]=k.split("-").map(Number);
     out += `<p class="month">${cap(MOIS[mo-1])} ${y}</p><div class="list">${
-      list.map(rendu).join("")}</div>`;
+      list.map(it=> rendu(it, rang++)).join("")}</div>`;
   }
   return out;
 }
@@ -1223,6 +1314,7 @@ function renderList(){
   const l = elements();
   const res = document.getElementById("results");
   const trajets = STATE.periode === "trajets";
+  STATE.affiches = l;                 // ce que les boutons « ajouter » désignent
   majExport(l.filter(x=> exportable(x, trajets)).length, l.length, trajets);
   if(!l.length){
     res.innerHTML = `<p class="empty">Rien ne correspond à cette combinaison de filtres.</p>`;
@@ -1231,6 +1323,104 @@ function renderList(){
   }
   res.innerHTML = parMois(l, trajets?(t=>t.date):(b=>b.debut), trajets?ligneTrajet:ligneBloc);
   majSub(l.length, trajets);
+}
+
+/* ------------------------------------------------------------------
+   Ajouter un évènement seul : une fenêtre, pas un téléchargement muet.
+   La question du visiteur n'est pas « quel fichier ? » mais « et
+   maintenant, qu'est-ce que j'en fais ? » — surtout sur un téléphone, où
+   un .ics atterrit dans les téléchargements et n'en sort pas tout seul.
+   La fenêtre reprend donc la forme de celle de l'abonnement : un bouton
+   qui fait le bon geste selon l'appareil, une phrase qui annonce ce qui
+   va se passer, et la marche à suivre en toutes lettres.
+   ------------------------------------------------------------------ */
+function fichierEvenement(x, trajets){
+  const ics = calendrier([x], trajets, STATE.parDate,
+                         trajets ? titreTrajet(x) : titrePeriode(x));
+  const f = (trajets ? "trajet-" + x.date : "anna-" + x.debut) + ".ics";
+  const u = URL.createObjectURL(new Blob([ics], {type:"text/calendar;charset=utf-8"}));
+  const a = document.createElement("a");
+  a.href = u; a.download = f;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=> URL.revokeObjectURL(u), 10000);
+  return f;
+}
+
+/* De quoi parle l'évènement, en une ligne, pour que le visiteur reconnaisse
+   ce qu'il s'apprête à ajouter. */
+function resumeUn(x, trajets){
+  if(trajets) return cap(libelleDate(x.date))
+    + (x.date2 ? " ou " + libelleDate(x.date2) : "") + " · " + x.sens
+    + (x.passation ? " · " + x.brute : "");
+  return cap(libellePeriode(x)) + (defini(x.ou) ? " · " + x.ou : "");
+}
+
+function ouvrirAjout(x, trajets){
+  const c = champsEvenement(x, trajets, STATE.parDate);
+  const mode = modeProbable();
+  const onglets = MODES.map(m =>
+    `<button type="button" class="ong${m.id===mode?" on":""}" data-m="${m.id}">${m.lab}</button>`
+  ).join("");
+  const etapes = MODES.map(m =>
+    `<ol class="pas" data-m="${m.id}"${m.id===mode?"":" hidden"}>${
+      m.pasUn.map(t=>`<li>${t}</li>`).join("")}</ol>`).join("");
+
+  const v = document.createElement("div");
+  v.className = "voile";
+  v.innerHTML = `<div class="abo" role="dialog" aria-modal="true" aria-label="Ajouter cet évènement">
+    <h3>Ajouter cet évènement</h3>
+
+    <p class="quoi"><b>${esc(c.titre)}</b><br>${esc(resumeUn(x, trajets))}</p>
+
+    <div class="actions">
+      <button type="button" class="fort" id="aj-go">Ajouter à mon agenda</button>
+    </div>
+    <p class="dit"><span id="aj-dit"></span>
+      <button type="button" class="lien" id="aj-autre">Ce n'est pas mon agenda</button></p>
+
+    <div class="etapes ouvert">
+      <p class="titre-etapes">La marche à suivre</p>
+      <div class="ongs">${onglets}</div>
+      ${etapes}
+    </div>
+
+    <p class="avert">Cet évènement est une copie : il ne suivra pas les changements du planning.
+      Pour un agenda qui se tient à jour tout seul, abonnez-vous plutôt au calendrier.</p>
+
+    <div class="actions"><button type="button" id="aj-x">Fermer</button></div>
+  </div>`;
+  document.body.appendChild(v);
+  v.addEventListener("click", e=>{ if(e.target === v) fermerAbo(); });
+  document.getElementById("aj-x").addEventListener("click", fermerAbo);
+
+  let vise = mode;
+  function majMode(){
+    document.getElementById("aj-dit").textContent = modeDit(vise).ditUn + " ";
+    for(const b of v.querySelectorAll(".ong")) b.classList.toggle("on", b.dataset.m === vise);
+    for(const o of v.querySelectorAll(".pas")) o.hidden = o.dataset.m !== vise;
+  }
+  for(const b of v.querySelectorAll(".ong"))
+    b.addEventListener("click", ()=>{ vise = b.dataset.m; majMode(); });
+  document.getElementById("aj-autre").addEventListener("click", ()=>{
+    v.querySelector(".ongs").scrollIntoView({behavior:"smooth", block:"nearest"});
+  });
+  majMode();
+
+  document.getElementById("aj-go").addEventListener("click", ()=>{
+    if(modeDit(vise).agitUn === "google"){
+      window.open(versGoogleEvenement(x, trajets), "_blank", "noopener");
+      fermerAbo();
+      bandeau(`Google Agenda s'ouvre sur l'évènement. Il ne sera ajouté qu'une fois
+        enregistré. Si rien ne s'ouvre, votre navigateur a bloqué la fenêtre.`);
+    }else{
+      const f = fichierEvenement(x, trajets);
+      fermerAbo();
+      bandeau(vise === "ios"
+        ? `Fichier « ${f} » enregistré. Ouvrez-le depuis vos téléchargements pour
+           l'ajouter à votre agenda.`
+        : `Fichier « ${f} » téléchargé. Ouvrez-le pour ajouter l'évènement à votre agenda.`);
+    }
+  });
 }
 
 /* Le calendrier ne reçoit que ce qui est arrêté : son compte peut donc être
@@ -1243,11 +1433,15 @@ function majExport(n, total, trajets){
   // Pas de bouton tant qu'on ne sait pas si des calendriers ont été publiés :
   // mieux vaut ne rien proposer qu'un bouton qui s'excuse.
   b.hidden = !n || !STATE.calDispo;
-  if(n) b.innerHTML = ICONE_CAL + `<span>S'abonner au calendrier</span>`;
+  if(n) b.innerHTML = ICONE_CAL + `<span>S'abonner à ce calendrier</span>`;
   const reste = total - n;
-  note.hidden = !reste;
-  if(reste) note.textContent = `${reste} ${nom(reste)} encore à définir ${
-    reste > 1 ? "n'y figureront pas" : "n'y figurera pas"}.`;
+  // Sans bouton, la ligne « … n'y figureront pas » désignerait le vide. Quand rien
+  // n'est exportable, elle explique donc l'absence du bouton au lieu d'un écart.
+  note.hidden = !reste || !STATE.calDispo;
+  if(!note.hidden) note.textContent = n
+    ? `${reste} ${nom(reste)} encore à définir ${
+        reste > 1 ? "n'y figureront pas" : "n'y figurera pas"}.`
+    : `Rien à ajouter à un calendrier ici : la personne ou le lieu reste à définir partout.`;
 }
 
 function majSub(n, trajets){
@@ -1367,6 +1561,17 @@ function rendre(days){
     `<div id="results"></div>`;
   initTools();
   renderList();
+
+  // délégation : les vignettes sont réécrites à chaque filtre, pas le conteneur
+  document.getElementById("results").addEventListener("click", e=>{
+    const b = e.target.closest(".add");
+    if(!b) return;
+    const x = (STATE.affiches || [])[+b.dataset.i];
+    if(!x) return;
+    const trajets = STATE.periode === "trajets";
+    if(b.getAttribute("aria-disabled") === "true") bandeau(POURQUOI_PAS(x, trajets));
+    else ouvrirAjout(x, trajets);
+  });
 
   const bar=document.querySelector(".tools");
   const mesure=()=>{ if(bar) document.documentElement.style.setProperty(
