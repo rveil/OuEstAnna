@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Essai — ajouter un évènement</title>
+<style>
+  :root{color-scheme:light dark}
+  body{font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    margin:0;padding:1.2rem;max-width:34rem;margin-inline:auto}
+  h1{font-size:1.1rem;margin:0 0 .3rem}
+  .sous{color:#777;font-size:.85rem;margin:0 0 1.4rem}
+  .essai{border:1px solid #ccc;border-radius:12px;padding:.9rem;margin-bottom:.9rem}
+  .essai h2{font-size:.95rem;margin:0 0 .25rem}
+  .essai p{font-size:.82rem;color:#666;margin:0 0 .7rem}
+  a.b,button.b{display:block;width:100%;box-sizing:border-box;text-align:center;
+    font:inherit;font-size:.9rem;font-weight:600;padding:.7rem;border-radius:10px;
+    background:#111;color:#fff;border:0;text-decoration:none;cursor:pointer}
+  .att{font-size:.8rem;background:#fff5d6;color:#5a4500;border-radius:10px;padding:.7rem .8rem}
+  ol{font-size:.85rem;padding-left:1.2rem}
+  code{font-size:.78rem;background:#eee;padding:.1rem .3rem;border-radius:4px}
+  @media (prefers-color-scheme: dark){
+    body{background:#111;color:#eee} .essai{border-color:#333}
+    a.b,button.b{background:#eee;color:#111} code{background:#222}
+    .att{background:#3a2f00;color:#ffe9a3}
+  }
+</style>
+</head>
+<body>
+
+<h1>Essai : ajouter un évènement à l'agenda</h1>
+<p class="sous">Page jetable. Quatre façons de livrer le <b>même</b> évènement
+  (« Anna avec Raph », ven. 18 → dim. 20 septembre 2026). Le but est de voir
+  laquelle ouvre directement l'aperçu de l'évènement, et laquelle se contente de
+  télécharger un fichier.</p>
+
+<p class="att"><b>À faire :</b> essayez les quatre, dans l'ordre, et notez pour chacun
+  ce qui se passe — aperçu de l'évènement avec « Ajouter », ou fichier téléchargé,
+  ou rien du tout. À refaire sur iPhone <b>et</b> sur Mac si possible.</p>
+
+<div class="essai">
+  <h2>A — fichier fabriqué par la page</h2>
+  <p>C'est ce que fait la page aujourd'hui : le fichier est fabriqué dans le
+    navigateur et l'attribut <code>download</code> force l'enregistrement.</p>
+  <button class="b" id="a">Essai A</button>
+</div>
+
+<div class="essai">
+  <h2>B — même fichier, sans forcer le téléchargement</h2>
+  <p>Le même fichier fabriqué dans le navigateur, mais ouvert au lieu d'être
+    enregistré. Il est déclaré <code>text/calendar</code> — reste à savoir si iOS
+    en tient compte pour un fichier qui ne vient pas du serveur.</p>
+  <button class="b" id="b">Essai B</button>
+</div>
+
+<div class="essai">
+  <h2>C — vrai fichier sur le serveur</h2>
+  <p>Cette fois le fichier existe pour de bon sur GitHub, qui le sert avec le
+    véritable en-tête <code>Content-Type: text/calendar</code>. C'est la seule
+    variante où l'en-tête est réel.</p>
+  <a class="b" href="evenement-essai.ics">Essai C</a>
+</div>
+
+<div class="essai">
+  <h2>D — vrai fichier, dans un nouvel onglet</h2>
+  <p>Le même que C. Safari ne traite pas toujours de la même façon une navigation
+    et une ouverture dans un nouvel onglet.</p>
+  <a class="b" href="evenement-essai.ics" target="_blank" rel="noopener">Essai D</a>
+</div>
+
+<div class="essai">
+  <h2>Vérification</h2>
+  <p>Ce que le serveur annonce vraiment pour le fichier de C et D :</p>
+  <button class="b" id="v">Lire l'en-tête</button>
+  <p id="res" style="margin-top:.7rem;font-family:ui-monospace,Menlo,monospace"></p>
+</div>
+
+<ol>
+  <li>Si <b>C ou D</b> ouvre l'aperçu de l'évènement : la piste est bonne, je publierai
+    un fichier par évènement et le bouton pointera dessus.</li>
+  <li>Si seul <b>B</b> marche : pas besoin de toucher au serveur, il suffit de retirer
+    l'attribut <code>download</code>.</li>
+  <li>Si <b>tout se télécharge</b> : iOS ne sait pas faire autrement, et on en reste
+    à ce qui existe.</li>
+</ol>
+
+<script>
+const ICS = [
+  "BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Ou est Anna 4.0//FR",
+  "CALSCALE:GREGORIAN","METHOD:PUBLISH","X-WR-CALNAME:Anna avec Raph",
+  "X-PUBLISHED-TTL:PT6H","BEGIN:VEVENT",
+  "UID:p-2026-09-18-2026-09-20-Raph-Paris@ou-est-anna",
+  "DTSTAMP:20260831T120000Z","DTSTART;VALUE=DATE:20260918",
+  "DTEND;VALUE=DATE:20260921","SUMMARY:Anna avec Raph","LOCATION:Paris",
+  "TRANSP:TRANSPARENT","END:VEVENT","END:VCALENDAR"].join("\r\n") + "\r\n";
+
+const blob = () => URL.createObjectURL(
+  new Blob([ICS], {type:"text/calendar;charset=utf-8"}));
+
+document.getElementById("a").addEventListener("click", ()=>{
+  const a = document.createElement("a");
+  a.href = blob(); a.download = "evenement-essai.ics";
+  document.body.appendChild(a); a.click(); a.remove();
+});
+
+document.getElementById("b").addEventListener("click", ()=>{
+  location.href = blob();
+});
+
+document.getElementById("v").addEventListener("click", async ()=>{
+  const r = document.getElementById("res");
+  r.textContent = "…";
+  try{
+    const rep = await fetch("evenement-essai.ics", {cache:"no-store"});
+    r.textContent = "Content-Type : " + (rep.headers.get("content-type") || "(absent)")
+      + "  ·  " + rep.status;
+  }catch(e){ r.textContent = "échec : " + e.message; }
+});
+</script>
+</body>
+</html>
