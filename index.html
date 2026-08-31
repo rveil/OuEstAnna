@@ -322,7 +322,7 @@ const SHEET_GID = "1504266455";
    Ces lignes se fabriquent avec « Reglages.html », qui régénère un index.html
    complet — à garder sur votre ordinateur (ne pas le déposer sur GitHub).
    ------------------------------------------------------------------ */
-const COFFRE = "v2.300000.chvM2LA+1ZVJS711pUF61Q==.wLPTTbFUIKdGh38i.3APhr/5MVtWKo3lFiRBjtfVgcL9rlD582idrCQewMq0bAKWcJWsMpqp7SSXOI933pkZQFwPKqeDEhoG7EVkWdF7nSVwNn68PebHXRE3/BGscR9W2BQqb4+DqtVLtAhh7+m9JH4nmZRSKtanaGZJVoZOcyf2rzoQp1+DjqKEKOtSQKMNdPGp6j/rYhSAh4Nb2cbxdHjtesbxJrLfQkw6WBXG87ouYX3X0j0zL3Z7tThe1DIgGg0Gjq9E=";
+const COFFRE = "v2.300000.AsTI9DvsOjymetcns8pW7w==.2XzlHE2xzz9JAPCc.fXSIZzUGTDDOWnAuHTcKu2o2RQwFH1NGBr6oe9t1+Q4/5LEk7Cqgd5FLCZufe65zF5lHSWZxe7KVWf9fyg7WhO1mliZNK1TPSBdwebjD3vB5D4StOQ4IbzN4ppArMEJqaveXrSiytRgrI/etLn0INcdoJYjgW1jzg7mJj7fDbAT7MYPn0AiFKHyPPxJ+MIgCmPQIFv72ZALOR+0Lcle/IdVS3k3Z2fFwvkY1IbZDkHIkfl3gnNFfO4s=";
 const QUESTION = "Quelle est sa couleur préférée ?";
 
 /* ------------------------------------------------------------------ */
@@ -1403,6 +1403,11 @@ function ouvrirAjout(x, trajets){
     <p class="dit"><span id="aj-dit"></span>
       <button type="button" class="lien" id="aj-autre">Ce n'est pas mon agenda</button></p>
 
+    <p class="dit" id="aj-planb" hidden>Afficher l'aperçu d'un évènement avant de l'ajouter,
+      seul Safari sait le faire — les autres navigateurs ne peuvent que livrer un fichier.
+      Pour ajouter en un clic sans passer par un fichier :
+      <button type="button" class="lien" id="aj-gg">ouvrir dans Google Agenda</button>.</p>
+
     <div class="etapes ouvert">
       <p class="titre-etapes">La marche à suivre</p>
       <div class="ongs">${onglets}</div>
@@ -1418,11 +1423,26 @@ function ouvrirAjout(x, trajets){
   v.addEventListener("click", e=>{ if(e.target === v) fermerAbo(); });
   document.getElementById("aj-x").addEventListener("click", fermerAbo);
 
+  /* Ouvrir l'évènement dans Google Agenda : le seul « en un clic » qui existe hors
+     de Safari. On ne l'impose pas — qui lit Chrome sur un Mac tient peut-être son
+     agenda dans Calendrier, et le fichier lui va mieux — mais on cesse de le cacher
+     derrière un onglet dès que le navigateur ne sait pas montrer d'aperçu. */
+  const versGoogle = ()=>{
+    window.open(versGoogleEvenement(x, trajets), "_blank", "noopener");
+    fermerAbo();
+    bandeau(`Google Agenda s'ouvre sur l'évènement. Il ne sera ajouté qu'une fois
+      enregistré. Si rien ne s'ouvre, votre navigateur a bloqué la fenêtre.`);
+  };
+  document.getElementById("aj-gg").addEventListener("click", versGoogle);
+
   let vise = mode;
   function majMode(){
     document.getElementById("aj-dit").textContent = guideUn(vise).dit + " ";
     for(const b of v.querySelectorAll(".ong")) b.classList.toggle("on", b.dataset.m === vise);
     for(const o of v.querySelectorAll(".pas")) o.hidden = o.dataset.m !== vise;
+    // inutile de proposer Google quand Safari fait mieux, ou quand c'est déjà le geste
+    document.getElementById("aj-planb").hidden =
+      EST_SAFARI || modeDit(vise).agitUn === "google";
   }
   for(const b of v.querySelectorAll(".ong"))
     b.addEventListener("click", ()=>{ vise = b.dataset.m; majMode(); });
@@ -1433,10 +1453,7 @@ function ouvrirAjout(x, trajets){
 
   document.getElementById("aj-go").addEventListener("click", ()=>{
     if(modeDit(vise).agitUn === "google"){
-      window.open(versGoogleEvenement(x, trajets), "_blank", "noopener");
-      fermerAbo();
-      bandeau(`Google Agenda s'ouvre sur l'évènement. Il ne sera ajouté qu'une fois
-        enregistré. Si rien ne s'ouvre, votre navigateur a bloqué la fenêtre.`);
+      versGoogle();
     }else{
       const f = fichierEvenement(x, trajets);
       fermerAbo();
