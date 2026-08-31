@@ -322,7 +322,7 @@ const SHEET_GID = "1504266455";
    Ces lignes se fabriquent avec « Reglages.html », qui régénère un index.html
    complet — à garder sur votre ordinateur (ne pas le déposer sur GitHub).
    ------------------------------------------------------------------ */
-const COFFRE = "v2.300000.TJM4t14VNxD4fuWEh7qvVA==.rfY03dgj64s9Rlt9.bMU+kTFSuytL09nr5Of6Eu7A3bKyHN3k1YawiJupn1deTurYfPNS+IYGMp6xi7uz6n92AtfxcrvtTe5EvU+ITfYNlzRxWBglXgwJ2hoX6zs1pt1hF54Q+X1JxA9NLB0QIZoLLuoa69eAfwZrRBBPm288ty+8ikYzdJwcGDyOr+CYyVEWv/tIm1zPD9PXv2dZCq6F+T/erzkuSGBqDN4E6iKQjSGgT+cYOVQBFW/YXTqCnbCbAsdFRZs=";
+const COFFRE = "v2.300000.chvM2LA+1ZVJS711pUF61Q==.wLPTTbFUIKdGh38i.3APhr/5MVtWKo3lFiRBjtfVgcL9rlD582idrCQewMq0bAKWcJWsMpqp7SSXOI933pkZQFwPKqeDEhoG7EVkWdF7nSVwNn68PebHXRE3/BGscR9W2BQqb4+DqtVLtAhh7+m9JH4nmZRSKtanaGZJVoZOcyf2rzoQp1+DjqKEKOtSQKMNdPGp6j/rYhSAh4Nb2cbxdHjtesbxJrLfQkw6WBXG87ouYX3X0j0zL3Z7tThe1DIgGg0Gjq9E=";
 const QUESTION = "Quelle est sa couleur préférée ?";
 
 /* ------------------------------------------------------------------ */
@@ -971,7 +971,7 @@ const MODES = [
    agitUn:"fichier",
    ditUn:"Le fichier de l'évènement va s'enregistrer dans vos téléchargements.", pasUn:[
     "Touchez <b>Ajouter à mon agenda</b> : un fichier <b>.ics</b> s'enregistre.",
-    "Ouvrez-le — la flèche de téléchargement dans Safari, ou l'application <b>Fichiers</b> → <b>Téléchargements</b>.",
+    "Ouvrez-le — la flèche de téléchargement de votre navigateur, ou l'application <b>Fichiers</b> → <b>Téléchargements</b>.",
     "Le Calendrier s'ouvre sur l'évènement : <b>Ajouter tout</b>, choisissez l'agenda, puis <b>Ajouter</b>."],
    dit:"L'application Calendrier va s'ouvrir et vous proposer l'abonnement.", pas:[
     "Ouvrez l'application <b>Calendrier</b>.",
@@ -1015,6 +1015,25 @@ const MODES = [
       "parfois plusieurs heures avant de voir un changement."]},
 ];
 const modeDit = id => (MODES.find(m=> m.id === id) || MODES[0]);
+
+/* Safari sait ouvrir l'aperçu d'un évènement ; les autres navigateurs, non — ils
+   téléchargent le fichier, quoi qu'on fasse. Essai réel sur iPhone et sur Mac :
+   sans l'attribut « download », Safari affiche l'aperçu et propose d'ajouter ;
+   avec, il enregistre. Ailleurs on garde « download », car sans lui le fichier
+   arrive sous un nom illisible et sans extension, donc inutilisable. */
+const EST_SAFARI = /Safari/.test(navigator.userAgent)
+  && !/Chrom(e|ium)|CriOS|FxiOS|EdgiOS|Edg\/|OPR\//.test(navigator.userAgent);
+
+/* La marche à suivre pour un évènement seul dépend donc du navigateur autant que
+   de l'agenda : dans Safari il n'y a plus de fichier à aller chercher. */
+const APERCU = {
+  dit: "L'aperçu de l'évènement va s'ouvrir : il ne restera qu'à l'ajouter.",
+  pas: ["Touchez <b>Ajouter à mon agenda</b> : l'aperçu de l'évènement s'ouvre.",
+        "Choisissez l'agenda de destination, puis <b>Ajouter</b>."]};
+function guideUn(id){
+  const m = modeDit(id);
+  return (EST_SAFARI && m.agitUn === "fichier") ? APERCU : {dit:m.ditUn, pas:m.pasUn};
+}
 function modeProbable(){
   const ua = navigator.userAgent;
   if(/iPad|iPhone|iPod/.test(ua) || (/Mac/.test(ua) && navigator.maxTouchPoints > 1)) return "ios";
@@ -1339,9 +1358,15 @@ function fichierEvenement(x, trajets){
                          trajets ? titreTrajet(x) : titrePeriode(x));
   const f = (trajets ? "trajet-" + x.date : "anna-" + x.debut) + ".ics";
   const u = URL.createObjectURL(new Blob([ics], {type:"text/calendar;charset=utf-8"}));
-  const a = document.createElement("a");
-  a.href = u; a.download = f;
-  document.body.appendChild(a); a.click(); a.remove();
+  if(EST_SAFARI){
+    // exactement ce qui a été essayé sur iPhone et sur Mac : une navigation vers le
+    // blob, sans « download ». Safari affiche l'aperçu par-dessus la page.
+    location.href = u;
+  }else{
+    const a = document.createElement("a");
+    a.href = u; a.download = f;
+    document.body.appendChild(a); a.click(); a.remove();
+  }
   setTimeout(()=> URL.revokeObjectURL(u), 10000);
   return f;
 }
@@ -1363,7 +1388,7 @@ function ouvrirAjout(x, trajets){
   ).join("");
   const etapes = MODES.map(m =>
     `<ol class="pas" data-m="${m.id}"${m.id===mode?"":" hidden"}>${
-      m.pasUn.map(t=>`<li>${t}</li>`).join("")}</ol>`).join("");
+      guideUn(m.id).pas.map(t=>`<li>${t}</li>`).join("")}</ol>`).join("");
 
   const v = document.createElement("div");
   v.className = "voile";
@@ -1395,7 +1420,7 @@ function ouvrirAjout(x, trajets){
 
   let vise = mode;
   function majMode(){
-    document.getElementById("aj-dit").textContent = modeDit(vise).ditUn + " ";
+    document.getElementById("aj-dit").textContent = guideUn(vise).dit + " ";
     for(const b of v.querySelectorAll(".ong")) b.classList.toggle("on", b.dataset.m === vise);
     for(const o of v.querySelectorAll(".pas")) o.hidden = o.dataset.m !== vise;
   }
@@ -1415,6 +1440,7 @@ function ouvrirAjout(x, trajets){
     }else{
       const f = fichierEvenement(x, trajets);
       fermerAbo();
+      if(EST_SAFARI) return;   // l'aperçu s'ouvre par-dessus : un bandeau serait de trop
       bandeau(vise === "ios"
         ? `Fichier « ${f} » enregistré. Ouvrez-le depuis vos téléchargements pour
            l'ajouter à votre agenda.`
